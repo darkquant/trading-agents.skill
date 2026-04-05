@@ -34,7 +34,7 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured technical analysi
 > - **Investing.com**: `https://www.investing.com/` — 技术分析摘要、支撑/阻力位
 >
 > Search for: `{TICKER} technical analysis site:xueqiu.com`, `{TICKER} stock price history site:finance.yahoo.com`, `{TICKER} 技术分析 site:eastmoney.com`.
-> **Verify the current price from at least two个不同来源。**
+> **Verify the current price from at least two different sources.**
 > You can still compute basic indicators manually if you obtain at least 20-60 days of closing prices from web search results.
 
 ## Analysis Framework
