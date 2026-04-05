@@ -97,10 +97,13 @@ def compute_indicators(ticker: str) -> dict:
     import pandas as pd
 
     stock = yf.Ticker(ticker)
-    hist = _retry(lambda: stock.history(period="1y", interval="1d"), "price history")
+    try:
+        hist = _retry(lambda: stock.history(period="1y", interval="1d"), "price history")
+    except Exception:
+        hist = None
 
-    if hist.empty:
-        return {"ticker": ticker, "error": "No price data available", "fallback_required": True}
+    if hist is None or hist.empty:
+        return {"ticker": ticker, "error": "No price data available (network may be blocked)", "fallback_required": True}
 
     close = hist["Close"]
     high = hist["High"]

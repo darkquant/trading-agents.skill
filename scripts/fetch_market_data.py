@@ -41,6 +41,8 @@ def fetch_data(ticker: str) -> dict:
     # Basic info
     try:
         info = _retry(lambda: stock.info, "basic info")
+        if info is None:
+            raise ValueError("yfinance returned None for stock info (likely blocked by network)")
         result["info"] = {
             "name": info.get("longName", "N/A"),
             "sector": info.get("sector", "N/A"),
@@ -103,6 +105,8 @@ def fetch_data(ticker: str) -> dict:
     # Price history (6 months daily)
     try:
         hist = _retry(lambda: stock.history(period="6mo", interval="1d"), "price history")
+        if hist is None or hist.empty:
+            raise ValueError("No price history returned (likely blocked by network)")
         if not hist.empty:
             recent = hist.tail(60)  # Last ~60 trading days
             result["price_history"] = {
@@ -245,6 +249,10 @@ def main():
 
     print(f"Data saved to {output_file}")
     if data["errors"]:
+        data["fallback_required"] = True
+        # Re-write the file with fallback flag
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=2, default=str)
         print(f"Warnings: {', '.join(data['errors'])}")
         print("NOTE: Some data sections failed. Use web search to supplement missing data.")
 
