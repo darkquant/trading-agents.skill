@@ -9,45 +9,66 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured technical analysi
 ## Data Gathering
 
 1. **Run the market data script** to get price history:
+
    ```bash
-   python {SKILL_PATH}/scripts/fetch_market_data.py {TICKER}
+   cd {SKILL_PATH} && uv run scripts/fetch_market_data.py {TICKER}
    ```
 
 2. **Run the technical indicators script**:
+
    ```bash
-   python {SKILL_PATH}/scripts/technical_indicators.py {TICKER}
+   cd {SKILL_PATH} && uv run scripts/technical_indicators.py {TICKER}
    ```
+
    This computes RSI, MACD, Bollinger Bands, moving averages, and other indicators.
 
 3. **Web search** for recent technical analysis commentary on the stock if helpful.
 
+> **Fallback when scripts fail**: If either script fails or returns `"fallback_required": true` (yfinance and akshare both unavailable), you MUST use web search to gather the data instead. Do NOT produce a report without price data.
+>
+> **推荐数据来源（按优先级排列）：**
+> - **雪球 (Xueqiu)**: `https://xueqiu.com/S/{TICKER}` — 实时行情、K线、技术指标
+> - **雅虎财经 (Yahoo Finance)**: `https://finance.yahoo.com/quote/{TICKER}` — 历史价格、技术分析数据
+> - **东方财富 (Eastmoney)**: `https://www.eastmoney.com/` — 技术指标、资金流向、K线形态
+> - **TradingView**: `https://www.tradingview.com/symbols/{TICKER}/` — RSI, MACD, 布林带等技术指标
+> - **Investing.com**: `https://www.investing.com/` — 技术分析摘要、支撑/阻力位
+>
+> Search for: `{TICKER} technical analysis site:xueqiu.com`, `{TICKER} stock price history site:finance.yahoo.com`, `{TICKER} 技术分析 site:eastmoney.com`.
+> **Verify the current price from at least two different sources.**
+> You can still compute basic indicators manually if you obtain at least 20-60 days of closing prices from web search results.
+
 ## Analysis Framework
 
 ### Trend Analysis
+
 - Current trend direction (short-term, medium-term, long-term)
 - Key support and resistance levels
 - Moving average alignment (20, 50, 100, 200-day)
 - Whether the stock is trending, ranging, or at an inflection point
 
 ### Momentum Indicators
+
 - RSI (14-period): overbought/oversold/neutral
 - MACD: signal line crossovers, histogram direction, divergences
 - Stochastic oscillator if available
 - Rate of change / momentum
 
 ### Volume Analysis
+
 - Volume trends (increasing/decreasing with price moves)
 - Volume relative to average
 - Any volume divergences (price up on declining volume = weak)
 - Accumulation/distribution signals
 
 ### Volatility Assessment
+
 - Bollinger Band width and position
 - Average True Range (ATR)
 - Recent volatility compared to historical norms
 - Implied vs. historical volatility if available
 
 ### Pattern Recognition
+
 - Any chart patterns forming (head & shoulders, double top/bottom, flags, wedges)
 - Breakout/breakdown levels to watch
 - Gap analysis if relevant
@@ -58,29 +79,37 @@ Save your report to `{OUTPUT_DIR}/technical_analysis.md`:
 
 ```markdown
 # Technical Analysis: {TICKER}
+
 **Date**: {DATE}
 **Analyst**: Technical Analyst Agent
 
 ## Summary
+
 [2-3 sentence overall technical picture]
 
 ## Trend Analysis
+
 [Your findings with specific price levels]
 
 ## Momentum Indicators
+
 [RSI, MACD, etc. with current values]
 
 ## Volume Analysis
+
 [Your findings]
 
 ## Volatility Assessment
+
 [Your findings]
 
 ## Key Levels
+
 - **Resistance**: $X, $Y, $Z
 - **Support**: $A, $B, $C
 
 ## Technical Signal: [BULLISH / BEARISH / NEUTRAL]
+
 **Confidence**: [HIGH / MEDIUM / LOW]
 **Key Driver**: [One sentence explaining the primary technical reason]
 ```
@@ -112,6 +141,7 @@ Include a **数据来源** section at the end:
 
 ```markdown
 ## 数据来源
+
 1. [Yahoo Finance / TradingView](https://具体链接) — 价格历史、技术指标数据
 2. [具体技术分析评论来源](https://具体链接) — 第三方技术分析参考
 ```

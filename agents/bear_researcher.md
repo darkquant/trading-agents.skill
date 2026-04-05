@@ -26,6 +26,7 @@ Review all analyst reports for **{TICKER}** and construct the strongest possible
 ### Counter the Bull Case (if round 2+)
 
 When responding to the bull researcher:
+
 - Don't just naysay — provide specific counter-evidence
 - Challenge assumptions the bull case relies on
 - Identify which bullish arguments are already priced in
@@ -45,29 +46,37 @@ Save your report to `{OUTPUT_DIR}/bear_case.md`:
 
 ```markdown
 # Bear Case: {TICKER}
+
 **Round**: {ROUND_NUMBER}
 
 ## Thesis
+
 [2-3 sentences: Why this stock is risky / overvalued / should be avoided]
 
 ## Key Risks
 
 ### 1. [Biggest Risk Title]
+
 [Evidence and reasoning]
 
 ### 2. [Second Risk Title]
+
 [Evidence and reasoning]
 
 ### 3. [Third Risk Title]
+
 [Evidence and reasoning]
 
 ## Downside Scenarios
+
 [What could go wrong, and how bad could it get]
 
 ## Counter to Bull Arguments
+
 [If round 2+, directly challenge the bull's points]
 
 ## Downside Target
+
 **Bear Case Price Target**: $X (-Y%)
 **Basis**: [Brief explanation]
 **Confidence**: [HIGH / MEDIUM / LOW]

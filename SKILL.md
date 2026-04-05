@@ -9,6 +9,10 @@ description: >
   market research for specific tickers, investment recommendations, portfolio decisions, or wants
   a multi-perspective analysis of any publicly traded security. Also trigger when the user mentions
   "trading agents", "multi-agent trading", "stock swarm", or wants an AI-driven trading desk analysis.
+metadata:
+  openclaw:
+    requires:
+      bins: ["python3", "pip", "uv"]
 ---
 
 # TradingAgents: Multi-Agent Trading Analysis Skill
@@ -17,6 +21,27 @@ This skill orchestrates a swarm of Claude subagents that mirror the structure of
 Each agent has a distinct role, specific tools, and a clear mandate. The agents collaborate through
 structured reports, adversarial debate, and sequential review — producing a final trading recommendation
 that reflects diverse analytical perspectives.
+
+## Prerequisites
+
+This skill requires **Python**, **pip**, and **uv** to be installed on the system. Before running
+any analysis, set up the Python environment:
+
+1. Install uv (if not already installed):
+
+   ```bash
+   pip install -U uv
+   ```
+
+2. Sync the project dependencies from the skill directory:
+   ```bash
+   cd {SKILL_PATH} && uv sync
+   ```
+   This installs all required packages (yfinance, akshare, etc.) into a managed virtual environment
+   based on `pyproject.toml`. You only need to do this once, or when dependencies change.
+
+All Python scripts in this skill must be executed with `uv run` to ensure they use the correct
+environment. For example: `uv run scripts/fetch_market_data.py NVDA`
 
 ## Architecture Overview
 
@@ -37,6 +62,7 @@ When the user asks for a stock analysis or trading decision, follow these steps:
 ### Step 0: Parse the Request
 
 Extract from the user's message:
+
 - **Ticker(s)**: The stock symbol(s) to analyze (e.g., NVDA, AAPL)
 - **Date context**: Whether they want current analysis or historical (default: today)
 - **Debate rounds**: If specified, how many bull/bear rounds (default: 1)
@@ -50,6 +76,7 @@ Spawn **four analyst subagents simultaneously** using the Agent tool. Each agent
 prompt from the `agents/` directory. Pass each agent the ticker, date, and any user context.
 
 Read the agent prompts before spawning:
+
 - `agents/fundamental_analyst.md` — Analyzes financial health, valuation, earnings
 - `agents/technical_analyst.md` — Analyzes price patterns, indicators, chart signals
 - `agents/sentiment_analyst.md` — Gauges market mood from social media and forums
@@ -98,6 +125,7 @@ and research_summary.md files should still be saved separately as well.
 ### Step 4: Trading Decision
 
 Spawn the **trader agent** (read `agents/trader.md`). Give it:
+
 - All four analyst reports
 - The research debate summary
 - The user's original context/constraints
@@ -108,6 +136,7 @@ entry/exit points, and confidence level.
 ### Step 5: Risk Management Review
 
 Spawn the **risk manager** (read `agents/risk_manager.md`). Give it:
+
 - The trader's recommendation
 - All analyst reports
 - Current portfolio context if available
@@ -118,6 +147,7 @@ volatility assessment, downside scenarios, and liquidity concerns.
 ### Step 6: Portfolio Manager Approval
 
 Spawn the **portfolio manager** (read `agents/portfolio_manager.md`). Give it everything:
+
 - Analyst reports, debate summary, trader recommendation, risk assessment
 
 The portfolio manager makes the final call: APPROVE, REJECT, or MODIFY the recommendation,
@@ -157,7 +187,12 @@ Produce **two outputs**:
 - `scripts/fetch_market_data.py` — Fetches price history, financial statements, and key metrics via yfinance
 - `scripts/technical_indicators.py` — Computes common technical indicators (RSI, MACD, Bollinger Bands, moving averages)
 
-These scripts are used by the analyst agents. They should be executed via `python scripts/fetch_market_data.py <TICKER>` from the skill directory.
+These scripts are used by the analyst agents. Run them from the skill directory using `uv run`:
+
+```bash
+uv run scripts/fetch_market_data.py <TICKER> [-o OUTPUT_DIR]
+uv run scripts/technical_indicators.py <TICKER> [-o OUTPUT_DIR]
+```
 
 ## Source Citation & Data Quality Standards
 

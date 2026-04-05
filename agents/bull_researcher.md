@@ -26,6 +26,7 @@ Review all analyst reports for **{TICKER}** and construct the strongest possible
 ### Counter the Bear Case (if round 2+)
 
 When responding to the bear researcher:
+
 - Don't just dismiss their arguments — address them specifically
 - Provide counter-evidence or alternative interpretations
 - Acknowledge valid concerns but explain why the bullish factors outweigh them
@@ -45,29 +46,37 @@ Save your report to `{OUTPUT_DIR}/bull_case.md`:
 
 ```markdown
 # Bull Case: {TICKER}
+
 **Round**: {ROUND_NUMBER}
 
 ## Thesis
+
 [2-3 sentences: Why this stock is a compelling buy right now]
 
 ## Key Arguments
 
 ### 1. [Strongest Argument Title]
+
 [Evidence and reasoning]
 
 ### 2. [Second Argument Title]
+
 [Evidence and reasoning]
 
 ### 3. [Third Argument Title]
+
 [Evidence and reasoning]
 
 ## Catalysts & Timeline
+
 [What events could drive the stock higher, and when]
 
 ## Counter to Bear Arguments
+
 [If round 2+, directly address the bear's points]
 
 ## Target Upside
+
 **Bull Case Price Target**: $X (+Y%)
 **Basis**: [Brief explanation of how you arrived at this target]
 **Confidence**: [HIGH / MEDIUM / LOW]

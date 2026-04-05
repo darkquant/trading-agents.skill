@@ -1,1 +1,4 @@
-/eval-review-iteration-*.html
+/eval-review*
+/*.json
+/.DS_Store
+__pycache__

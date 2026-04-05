@@ -26,14 +26,25 @@ Agent prompts use `{TICKER}`, `{DATE}`, `{SKILL_PATH}`, and `{OUTPUT_DIR}` as te
 - `scripts/technical_indicators.py` — Computes RSI, MACD, Bollinger Bands, moving averages, etc.
 - `evals/evals.json` — Test prompts for evaluating the skill
 
-## Running the Helper Scripts
+## Prerequisites
+
+This skill requires **Python**, **pip**, and **uv** preinstalled. Before running any analysis:
 
 ```bash
-python scripts/fetch_market_data.py TICKER [-o OUTPUT_DIR]
-python scripts/technical_indicators.py TICKER [-o OUTPUT_DIR]
+pip install -U uv  # Install/upgrade uv
+uv sync            # Install project dependencies from pyproject.toml
 ```
 
-Both scripts auto-install `yfinance` (and `numpy` for indicators) if not present. They output JSON files named `{TICKER}_market_data.json` and `{TICKER}_technical_indicators.json`.
+## Running the Helper Scripts
+
+All Python scripts must be executed with `uv run` to use the managed virtual environment:
+
+```bash
+uv run scripts/fetch_market_data.py TICKER [-o OUTPUT_DIR]
+uv run scripts/technical_indicators.py TICKER [-o OUTPUT_DIR]
+```
+
+They output JSON files named `{TICKER}_market_data.json` and `{TICKER}_technical_indicators.json`.
 
 ## Git Conventions
 

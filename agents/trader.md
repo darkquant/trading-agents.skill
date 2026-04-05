@@ -39,33 +39,39 @@ Save your report to `{OUTPUT_DIR}/trading_recommendation.md`:
 # Trading Recommendation: {TICKER}
 
 ## Decision: [BUY / SELL / HOLD]
+
 **Confidence**: [HIGH / MEDIUM / LOW]
 
 ## Signal Alignment
-| Analysis Type   | Signal  | Confidence | Key Factor |
-|----------------|---------|------------|------------|
-| Fundamental     | ...     | ...        | ...        |
-| Technical       | ...     | ...        | ...        |
-| Sentiment       | ...     | ...        | ...        |
-| News            | ...     | ...        | ...        |
-| Research Summary| ...     | ...        | ...        |
+
+| Analysis Type    | Signal | Confidence | Key Factor |
+| ---------------- | ------ | ---------- | ---------- |
+| Fundamental      | ...    | ...        | ...        |
+| Technical        | ...    | ...        | ...        |
+| Sentiment        | ...    | ...        | ...        |
+| News             | ...    | ...        | ...        |
+| Research Summary | ...    | ...        | ...        |
 
 ## Recommendation Details
 
 ### Entry Strategy
+
 - **Action**: [Buy at market / Buy on pullback to $X / etc.]
 - **Position Size**: [As % of portfolio — suggest based on conviction]
 - **Time Horizon**: [Short-term trade / Medium-term swing / Long-term hold]
 
 ### Risk Management
+
 - **Stop Loss**: $X (-Y% from entry)
 - **Take Profit Target 1**: $X (+Y%)
 - **Take Profit Target 2**: $X (+Y%)
 - **Risk/Reward Ratio**: X:1
 
 ### Key Rationale
+
 [3-5 sentences explaining why this trade makes sense right now]
 
 ### What Could Change This View
+
 [Conditions that would invalidate this recommendation]
 ```
