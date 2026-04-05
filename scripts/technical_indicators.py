@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Compute technical indicators for a given stock ticker.
+Primary source: yfinance. Fallback: akshare (for HK, US, and A-share stocks).
 Outputs a JSON file with RSI, MACD, Bollinger Bands, moving averages, and more.
 
 Usage: python technical_indicators.py TICKER [--output OUTPUT_DIR]
@@ -8,12 +9,12 @@ Usage: python technical_indicators.py TICKER [--output OUTPUT_DIR]
 
 import argparse
 import json
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-import yfinance as yf
 
 MAX_RETRIES = 3
 RETRY_DELAY_SECONDS = 2
@@ -33,6 +34,10 @@ def _retry(func, description: str, retries: int = MAX_RETRIES):
                 time.sleep(delay)
     raise last_error
 
+
+# ---------------------------------------------------------------------------
+# Technical indicator functions
+# ---------------------------------------------------------------------------
 
 def sma(data, period):
     """Simple Moving Average."""
@@ -74,15 +79,6 @@ def bollinger_bands(data, period=20, std_dev=2):
     return upper, middle, lower
 
 
-def atr(high, low, close, period=14):
-    """Average True Range."""
-    tr1 = high - low
-    tr2 = abs(high - close.shift(1))
-    tr3 = abs(low - close.shift(1))
-    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-    return tr.rolling(window=period).mean()
-
-
 def stochastic(high, low, close, k_period=14, d_period=3):
     """Stochastic Oscillator."""
     lowest_low = low.rolling(window=k_period).min()
@@ -92,35 +88,94 @@ def stochastic(high, low, close, k_period=14, d_period=3):
     return k, d
 
 
-def compute_indicators(ticker: str) -> dict:
-    """Compute all technical indicators for a ticker."""
-    import pandas as pd
+# ---------------------------------------------------------------------------
+# Price data fetching: yfinance (primary) → akshare (fallback)
+# ---------------------------------------------------------------------------
 
+def _fetch_hist_yfinance(ticker: str) -> pd.DataFrame:
+    """Fetch 1-year daily history via yfinance. Returns DataFrame with Close/High/Low/Volume."""
+    import yfinance as yf
     stock = yf.Ticker(ticker)
-    try:
-        hist = _retry(lambda: stock.history(period="1y", interval="1d"), "price history")
-    except Exception:
-        hist = None
-
+    hist = _retry(lambda: stock.history(period="1y", interval="1d"), "yfinance price history")
     if hist is None or hist.empty:
-        return {"ticker": ticker, "error": "No price data available (network may be blocked)", "fallback_required": True}
+        raise ValueError("yfinance returned empty data (likely blocked by network)")
+    return hist
 
+
+def _fetch_hist_akshare(ticker: str) -> pd.DataFrame:
+    """Fetch ~1 year daily history via akshare. Returns DataFrame normalized to Close/High/Low/Volume columns."""
+    # Import ticker utilities from our sibling module
+    script_dir = Path(__file__).parent
+    sys.path.insert(0, str(script_dir))
+    from fetch_market_data import _detect_market, _fetch_akshare_hist
+
+    market = _detect_market(ticker)
+    df = _fetch_akshare_hist(ticker, market, days=365)
+    if df is None or df.empty:
+        raise ValueError("akshare returned empty data")
+
+    # Normalize to match yfinance column names (capitalized)
+    rename_map = {}
+    for col in ["close", "high", "low", "open", "volume"]:
+        if col in df.columns:
+            rename_map[col] = col.capitalize()
+    df = df.rename(columns=rename_map)
+
+    # Set date as index if present
+    if "date" in df.columns:
+        df = df.set_index("date")
+    elif "Date" in df.columns:
+        df = df.set_index("Date")
+
+    return df
+
+
+def fetch_price_history(ticker: str) -> tuple:
+    """Try yfinance first, fall back to akshare. Returns (DataFrame, source_name)."""
+    # Try yfinance
+    try:
+        print(f"[yfinance] Fetching price history for {ticker}...")
+        hist = _fetch_hist_yfinance(ticker)
+        print(f"[yfinance] Got {len(hist)} days of data.")
+        return hist, "yfinance"
+    except Exception as e:
+        print(f"[yfinance] Failed: {e}")
+
+    # Try akshare
+    try:
+        print(f"[akshare] Trying fallback for {ticker}...")
+        hist = _fetch_hist_akshare(ticker)
+        print(f"[akshare] Got {len(hist)} days of data.")
+        return hist, "akshare"
+    except Exception as e:
+        print(f"[akshare] Also failed: {e}")
+
+    return None, "none"
+
+
+# ---------------------------------------------------------------------------
+# Compute indicators from a DataFrame
+# ---------------------------------------------------------------------------
+
+def compute_indicators(hist: pd.DataFrame, ticker: str, source: str) -> dict:
+    """Compute all technical indicators from a price history DataFrame."""
     close = hist["Close"]
     high = hist["High"]
     low = hist["Low"]
-    volume = hist["Volume"]
+    volume = hist["Volume"] if "Volume" in hist.columns else None
 
     result = {
         "ticker": ticker,
+        "source": source,
         "computed_at": datetime.now().isoformat(),
         "data_range": {
-            "start": hist.index[0].strftime("%Y-%m-%d"),
-            "end": hist.index[-1].strftime("%Y-%m-%d"),
+            "start": hist.index[0].strftime("%Y-%m-%d") if hasattr(hist.index[0], "strftime") else str(hist.index[0]),
+            "end": hist.index[-1].strftime("%Y-%m-%d") if hasattr(hist.index[-1], "strftime") else str(hist.index[-1]),
             "trading_days": len(hist),
         },
         "current": {
             "price": round(float(close.iloc[-1]), 2),
-            "date": hist.index[-1].strftime("%Y-%m-%d"),
+            "date": hist.index[-1].strftime("%Y-%m-%d") if hasattr(hist.index[-1], "strftime") else str(hist.index[-1]),
         },
     }
 
@@ -165,11 +220,7 @@ def compute_indicators(ticker: str) -> dict:
     current_rsi = float(rsi_val.iloc[-1])
     result["rsi"] = {
         "value": round(current_rsi, 2),
-        "signal": "OVERBOUGHT"
-        if current_rsi > 70
-        else "OVERSOLD"
-        if current_rsi < 30
-        else "NEUTRAL",
+        "signal": "OVERBOUGHT" if current_rsi > 70 else "OVERSOLD" if current_rsi < 30 else "NEUTRAL",
         "recent_values": [round(float(v), 2) for v in rsi_val.tail(5).values],
     }
 
@@ -179,12 +230,8 @@ def compute_indicators(ticker: str) -> dict:
         "macd_line": round(float(macd_line.iloc[-1]), 4),
         "signal_line": round(float(signal_line.iloc[-1]), 4),
         "histogram": round(float(histogram.iloc[-1]), 4),
-        "signal": "BULLISH"
-        if float(macd_line.iloc[-1]) > float(signal_line.iloc[-1])
-        else "BEARISH",
-        "histogram_direction": "EXPANDING"
-        if abs(float(histogram.iloc[-1])) > abs(float(histogram.iloc[-2]))
-        else "CONTRACTING",
+        "signal": "BULLISH" if float(macd_line.iloc[-1]) > float(signal_line.iloc[-1]) else "BEARISH",
+        "histogram_direction": "EXPANDING" if abs(float(histogram.iloc[-1])) > abs(float(histogram.iloc[-2])) else "CONTRACTING",
     }
 
     # Check for MACD crossover
@@ -209,18 +256,11 @@ def compute_indicators(ticker: str) -> dict:
         "middle": round(float(middle.iloc[-1]), 2),
         "lower": round(bb_lower, 2),
         "width_pct": round(bb_width, 2),
-        "position": "ABOVE_UPPER"
-        if current_price > bb_upper
-        else "BELOW_LOWER"
-        if current_price < bb_lower
-        else "WITHIN",
-        "percent_b": round((current_price - bb_lower) / (bb_upper - bb_lower) * 100, 2)
-        if bb_upper != bb_lower
-        else 50,
+        "position": "ABOVE_UPPER" if current_price > bb_upper else "BELOW_LOWER" if current_price < bb_lower else "WITHIN",
+        "percent_b": round((current_price - bb_lower) / (bb_upper - bb_lower) * 100, 2) if bb_upper != bb_lower else 50,
     }
 
-    # ATR (using pandas)
-
+    # ATR
     tr1 = high - low
     tr2 = abs(high - close.shift(1))
     tr3 = abs(low - close.shift(1))
@@ -236,26 +276,19 @@ def compute_indicators(ticker: str) -> dict:
     result["stochastic"] = {
         "k": round(float(k.iloc[-1]), 2),
         "d": round(float(d.iloc[-1]), 2),
-        "signal": "OVERBOUGHT"
-        if float(k.iloc[-1]) > 80
-        else "OVERSOLD"
-        if float(k.iloc[-1]) < 20
-        else "NEUTRAL",
+        "signal": "OVERBOUGHT" if float(k.iloc[-1]) > 80 else "OVERSOLD" if float(k.iloc[-1]) < 20 else "NEUTRAL",
     }
 
     # Volume analysis
-    avg_vol_20 = float(volume.tail(20).mean())
-    last_vol = float(volume.iloc[-1])
-    result["volume"] = {
-        "last": int(last_vol),
-        "avg_20d": int(avg_vol_20),
-        "ratio_vs_avg": round(last_vol / avg_vol_20, 2) if avg_vol_20 > 0 else None,
-        "trend": "ABOVE_AVERAGE"
-        if last_vol > avg_vol_20 * 1.2
-        else "BELOW_AVERAGE"
-        if last_vol < avg_vol_20 * 0.8
-        else "NORMAL",
-    }
+    if volume is not None and len(volume) > 0:
+        avg_vol_20 = float(volume.tail(20).mean())
+        last_vol = float(volume.iloc[-1])
+        result["volume"] = {
+            "last": int(last_vol),
+            "avg_20d": int(avg_vol_20),
+            "ratio_vs_avg": round(last_vol / avg_vol_20, 2) if avg_vol_20 > 0 else None,
+            "trend": "ABOVE_AVERAGE" if last_vol > avg_vol_20 * 1.2 else "BELOW_AVERAGE" if last_vol < avg_vol_20 * 0.8 else "NORMAL",
+        }
 
     # Support & Resistance (simple pivot points)
     last_high = float(high.iloc[-1])
@@ -273,22 +306,18 @@ def compute_indicators(ticker: str) -> dict:
     # Overall technical summary
     bullish_signals = 0
     bearish_signals = 0
-
     if result["rsi"]["signal"] == "OVERSOLD":
         bullish_signals += 1
     elif result["rsi"]["signal"] == "OVERBOUGHT":
         bearish_signals += 1
-
     if result["macd"]["signal"] == "BULLISH":
         bullish_signals += 1
     else:
         bearish_signals += 1
-
     if result.get("ma_alignment") in ["STRONGLY_BULLISH", "BULLISH"]:
         bullish_signals += 1
     elif result.get("ma_alignment") in ["STRONGLY_BEARISH", "BEARISH"]:
         bearish_signals += 1
-
     if result["stochastic"]["signal"] == "OVERSOLD":
         bullish_signals += 1
     elif result["stochastic"]["signal"] == "OVERBOUGHT":
@@ -297,63 +326,72 @@ def compute_indicators(ticker: str) -> dict:
     result["overall_technical_signal"] = {
         "bullish_indicators": bullish_signals,
         "bearish_indicators": bearish_signals,
-        "summary": "BULLISH"
-        if bullish_signals > bearish_signals
-        else "BEARISH"
-        if bearish_signals > bullish_signals
-        else "NEUTRAL",
+        "summary": "BULLISH" if bullish_signals > bearish_signals else "BEARISH" if bearish_signals > bullish_signals else "NEUTRAL",
     }
 
     return result
 
 
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="Compute technical indicators for a stock"
-    )
-    parser.add_argument("ticker", help="Stock ticker symbol (e.g., NVDA, AAPL)")
+    parser = argparse.ArgumentParser(description="Compute technical indicators for a stock")
+    parser.add_argument("ticker", help="Stock ticker symbol (e.g., NVDA, AAPL, 1810.HK, 0883.HK)")
     parser.add_argument("--output", "-o", default=".", help="Output directory")
     args = parser.parse_args()
 
     ticker = args.ticker.upper()
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
+    output_file = output_dir / f"{ticker}_technical_indicators.json"
 
     print(f"Computing technical indicators for {ticker}...")
-    try:
-        data = compute_indicators(ticker)
-    except Exception as e:
+    hist, source = fetch_price_history(ticker)
+
+    if hist is None or hist.empty:
         data = {
             "ticker": ticker,
             "computed_at": datetime.now().isoformat(),
-            "error": f"CRITICAL: All retries failed — {e}",
+            "error": "No price data available from yfinance or akshare (network may be blocked)",
             "fallback_required": True,
         }
-        output_file = output_dir / f"{ticker}_technical_indicators.json"
         with open(output_file, "w") as f:
             json.dump(data, f, indent=2, default=str)
-        print(f"ERROR: Could not compute indicators for {ticker} after {MAX_RETRIES} retries.")
+        print(f"ERROR: Could not get price data for {ticker} from any source.")
         print(f"Partial result saved to {output_file}")
         print("FALLBACK: Use web search to obtain price data and compute indicators manually.")
         return
 
-    output_file = output_dir / f"{ticker}_technical_indicators.json"
+    try:
+        data = compute_indicators(hist, ticker, source)
+    except Exception as e:
+        data = {
+            "ticker": ticker,
+            "source": source,
+            "computed_at": datetime.now().isoformat(),
+            "error": f"Failed to compute indicators: {e}",
+            "fallback_required": True,
+        }
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+        print(f"ERROR: Got price data from {source} but failed to compute indicators: {e}")
+        print("FALLBACK: Use web search to obtain price data and compute indicators manually.")
+        return
+
     with open(output_file, "w") as f:
         json.dump(data, f, indent=2, default=str)
-
     print(f"Indicators saved to {output_file}")
 
     # Print summary
-    if "error" not in data:
-        print(f"\nCurrent Price: {data['current']['price']}")
-        print(f"RSI(14): {data['rsi']['value']} ({data['rsi']['signal']})")
-        print(f"MACD Signal: {data['macd']['signal']}")
-        if "ma_alignment" in data:
-            print(f"MA Alignment: {data['ma_alignment']}")
-        print(f"Overall: {data['overall_technical_signal']['summary']}")
-    else:
-        print(f"\nWARNING: {data['error']}")
-        print("FALLBACK: Use web search to obtain price data and compute indicators manually.")
+    print(f"\nSource: {source}")
+    print(f"Current Price: {data['current']['price']}")
+    print(f"RSI(14): {data['rsi']['value']} ({data['rsi']['signal']})")
+    print(f"MACD Signal: {data['macd']['signal']}")
+    if "ma_alignment" in data:
+        print(f"MA Alignment: {data['ma_alignment']}")
+    print(f"Overall: {data['overall_technical_signal']['summary']}")
 
 
 if __name__ == "__main__":
