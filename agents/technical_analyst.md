@@ -24,11 +24,18 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured technical analysi
 
 3. **Web search** for recent technical analysis commentary on the stock if helpful.
 
-> **Fallback when scripts fail**: If either script fails or returns `"fallback_required": true`, you MUST use web search to gather the data instead. Do NOT produce a report without price data.
+> **Fallback when scripts fail**: If either script fails or returns `"fallback_required": true` (yfinance and akshare both unavailable), you MUST use web search to gather the data instead. Do NOT produce a report without price data.
 >
-> - Search for `{TICKER} stock price history` and `{TICKER} technical analysis` to get recent price levels, moving averages, RSI, and MACD values from sources like TradingView, Investing.com, or MarketWatch.
-> - Search for `{TICKER} stock price today` from at least two sources to verify the current price.
-> - You can still compute basic indicators manually if you obtain at least 20-60 days of closing prices from web search results.
+> **推荐数据来源（按优先级排列）：**
+> - **雪球 (Xueqiu)**: `https://xueqiu.com/S/{TICKER}` — 实时行情、K线、技术指标
+> - **雅虎财经 (Yahoo Finance)**: `https://finance.yahoo.com/quote/{TICKER}` — 历史价格、技术分析数据
+> - **东方财富 (Eastmoney)**: `https://www.eastmoney.com/` — 技术指标、资金流向、K线形态
+> - **TradingView**: `https://www.tradingview.com/symbols/{TICKER}/` — RSI, MACD, 布林带等技术指标
+> - **Investing.com**: `https://www.investing.com/` — 技术分析摘要、支撑/阻力位
+>
+> Search for: `{TICKER} technical analysis site:xueqiu.com`, `{TICKER} stock price history site:finance.yahoo.com`, `{TICKER} 技术分析 site:eastmoney.com`.
+> **Verify the current price from at least two个不同来源。**
+> You can still compute basic indicators manually if you obtain at least 20-60 days of closing prices from web search results.
 
 ## Analysis Framework
 
