@@ -8,17 +8,10 @@ Usage: python fetch_market_data.py TICKER [--output OUTPUT_DIR]
 
 import argparse
 import json
-import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
-try:
-    import yfinance as yf
-except ImportError:
-    print("yfinance not installed. Installing...")
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "yfinance", "--break-system-packages", "-q"])
-    import yfinance as yf
+import yfinance as yf
 
 
 def fetch_data(ticker: str) -> dict:
@@ -95,8 +88,14 @@ def fetch_data(ticker: str) -> dict:
             recent = hist.tail(60)  # Last ~60 trading days
             result["price_history"] = {
                 "current_price": float(hist["Close"].iloc[-1]),
-                "previous_close": float(hist["Close"].iloc[-2]) if len(hist) > 1 else None,
-                "daily_change_pct": float((hist["Close"].iloc[-1] / hist["Close"].iloc[-2] - 1) * 100) if len(hist) > 1 else None,
+                "previous_close": float(hist["Close"].iloc[-2])
+                if len(hist) > 1
+                else None,
+                "daily_change_pct": float(
+                    (hist["Close"].iloc[-1] / hist["Close"].iloc[-2] - 1) * 100
+                )
+                if len(hist) > 1
+                else None,
                 "week_high": float(recent.tail(5)["High"].max()),
                 "week_low": float(recent.tail(5)["Low"].min()),
                 "month_high": float(recent.tail(22)["High"].max()),
@@ -129,7 +128,9 @@ def fetch_data(ticker: str) -> dict:
         if income is not None and not income.empty:
             result["income_statement"] = {}
             for col in income.columns[:4]:  # Last 4 periods
-                period = col.strftime("%Y-%m-%d") if hasattr(col, "strftime") else str(col)
+                period = (
+                    col.strftime("%Y-%m-%d") if hasattr(col, "strftime") else str(col)
+                )
                 result["income_statement"][period] = {
                     k: float(v) if v == v else None  # NaN check
                     for k, v in income[col].items()
@@ -143,10 +144,11 @@ def fetch_data(ticker: str) -> dict:
         if balance is not None and not balance.empty:
             result["balance_sheet"] = {}
             for col in balance.columns[:4]:
-                period = col.strftime("%Y-%m-%d") if hasattr(col, "strftime") else str(col)
+                period = (
+                    col.strftime("%Y-%m-%d") if hasattr(col, "strftime") else str(col)
+                )
                 result["balance_sheet"][period] = {
-                    k: float(v) if v == v else None
-                    for k, v in balance[col].items()
+                    k: float(v) if v == v else None for k, v in balance[col].items()
                 }
     except Exception as e:
         result["errors"].append(f"Failed to fetch balance sheet: {e}")
@@ -157,10 +159,11 @@ def fetch_data(ticker: str) -> dict:
         if cashflow is not None and not cashflow.empty:
             result["cash_flow"] = {}
             for col in cashflow.columns[:4]:
-                period = col.strftime("%Y-%m-%d") if hasattr(col, "strftime") else str(col)
+                period = (
+                    col.strftime("%Y-%m-%d") if hasattr(col, "strftime") else str(col)
+                )
                 result["cash_flow"][period] = {
-                    k: float(v) if v == v else None
-                    for k, v in cashflow[col].items()
+                    k: float(v) if v == v else None for k, v in cashflow[col].items()
                 }
     except Exception as e:
         result["errors"].append(f"Failed to fetch cash flow: {e}")
@@ -169,7 +172,9 @@ def fetch_data(ticker: str) -> dict:
     try:
         holders = stock.institutional_holders
         if holders is not None and not holders.empty:
-            result["top_institutional_holders"] = holders.head(10).to_dict(orient="records")
+            result["top_institutional_holders"] = holders.head(10).to_dict(
+                orient="records"
+            )
     except Exception:
         pass
 
@@ -177,7 +182,9 @@ def fetch_data(ticker: str) -> dict:
     try:
         insiders = stock.insider_transactions
         if insiders is not None and not insiders.empty:
-            result["recent_insider_transactions"] = insiders.head(10).to_dict(orient="records")
+            result["recent_insider_transactions"] = insiders.head(10).to_dict(
+                orient="records"
+            )
     except Exception:
         pass
 

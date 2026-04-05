@@ -8,23 +8,11 @@ Usage: python technical_indicators.py TICKER [--output OUTPUT_DIR]
 
 import argparse
 import json
-import sys
 from datetime import datetime
 from pathlib import Path
 
-try:
-    import yfinance as yf
-except ImportError:
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "yfinance", "--break-system-packages", "-q"])
-    import yfinance as yf
-
-try:
-    import numpy as np
-except ImportError:
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "--break-system-packages", "-q"])
-    import numpy as np
+import pandas as pd
+import yfinance as yf
 
 
 def sma(data, period):
@@ -88,6 +76,7 @@ def stochastic(high, low, close, k_period=14, d_period=3):
 def compute_indicators(ticker: str) -> dict:
     """Compute all technical indicators for a ticker."""
     import pandas as pd
+
     stock = yf.Ticker(ticker)
     hist = stock.history(period="1y", interval="1d")
 
@@ -154,7 +143,11 @@ def compute_indicators(ticker: str) -> dict:
     current_rsi = float(rsi_val.iloc[-1])
     result["rsi"] = {
         "value": round(current_rsi, 2),
-        "signal": "OVERBOUGHT" if current_rsi > 70 else "OVERSOLD" if current_rsi < 30 else "NEUTRAL",
+        "signal": "OVERBOUGHT"
+        if current_rsi > 70
+        else "OVERSOLD"
+        if current_rsi < 30
+        else "NEUTRAL",
         "recent_values": [round(float(v), 2) for v in rsi_val.tail(5).values],
     }
 
@@ -164,8 +157,12 @@ def compute_indicators(ticker: str) -> dict:
         "macd_line": round(float(macd_line.iloc[-1]), 4),
         "signal_line": round(float(signal_line.iloc[-1]), 4),
         "histogram": round(float(histogram.iloc[-1]), 4),
-        "signal": "BULLISH" if float(macd_line.iloc[-1]) > float(signal_line.iloc[-1]) else "BEARISH",
-        "histogram_direction": "EXPANDING" if abs(float(histogram.iloc[-1])) > abs(float(histogram.iloc[-2])) else "CONTRACTING",
+        "signal": "BULLISH"
+        if float(macd_line.iloc[-1]) > float(signal_line.iloc[-1])
+        else "BEARISH",
+        "histogram_direction": "EXPANDING"
+        if abs(float(histogram.iloc[-1])) > abs(float(histogram.iloc[-2]))
+        else "CONTRACTING",
     }
 
     # Check for MACD crossover
@@ -190,12 +187,18 @@ def compute_indicators(ticker: str) -> dict:
         "middle": round(float(middle.iloc[-1]), 2),
         "lower": round(bb_lower, 2),
         "width_pct": round(bb_width, 2),
-        "position": "ABOVE_UPPER" if current_price > bb_upper else "BELOW_LOWER" if current_price < bb_lower else "WITHIN",
-        "percent_b": round((current_price - bb_lower) / (bb_upper - bb_lower) * 100, 2) if bb_upper != bb_lower else 50,
+        "position": "ABOVE_UPPER"
+        if current_price > bb_upper
+        else "BELOW_LOWER"
+        if current_price < bb_lower
+        else "WITHIN",
+        "percent_b": round((current_price - bb_lower) / (bb_upper - bb_lower) * 100, 2)
+        if bb_upper != bb_lower
+        else 50,
     }
 
     # ATR (using pandas)
-    import pandas as pd
+
     tr1 = high - low
     tr2 = abs(high - close.shift(1))
     tr3 = abs(low - close.shift(1))
@@ -211,7 +214,11 @@ def compute_indicators(ticker: str) -> dict:
     result["stochastic"] = {
         "k": round(float(k.iloc[-1]), 2),
         "d": round(float(d.iloc[-1]), 2),
-        "signal": "OVERBOUGHT" if float(k.iloc[-1]) > 80 else "OVERSOLD" if float(k.iloc[-1]) < 20 else "NEUTRAL",
+        "signal": "OVERBOUGHT"
+        if float(k.iloc[-1]) > 80
+        else "OVERSOLD"
+        if float(k.iloc[-1]) < 20
+        else "NEUTRAL",
     }
 
     # Volume analysis
@@ -221,7 +228,11 @@ def compute_indicators(ticker: str) -> dict:
         "last": int(last_vol),
         "avg_20d": int(avg_vol_20),
         "ratio_vs_avg": round(last_vol / avg_vol_20, 2) if avg_vol_20 > 0 else None,
-        "trend": "ABOVE_AVERAGE" if last_vol > avg_vol_20 * 1.2 else "BELOW_AVERAGE" if last_vol < avg_vol_20 * 0.8 else "NORMAL",
+        "trend": "ABOVE_AVERAGE"
+        if last_vol > avg_vol_20 * 1.2
+        else "BELOW_AVERAGE"
+        if last_vol < avg_vol_20 * 0.8
+        else "NORMAL",
     }
 
     # Support & Resistance (simple pivot points)
@@ -264,14 +275,20 @@ def compute_indicators(ticker: str) -> dict:
     result["overall_technical_signal"] = {
         "bullish_indicators": bullish_signals,
         "bearish_indicators": bearish_signals,
-        "summary": "BULLISH" if bullish_signals > bearish_signals else "BEARISH" if bearish_signals > bullish_signals else "NEUTRAL",
+        "summary": "BULLISH"
+        if bullish_signals > bearish_signals
+        else "BEARISH"
+        if bearish_signals > bullish_signals
+        else "NEUTRAL",
     }
 
     return result
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Compute technical indicators for a stock")
+    parser = argparse.ArgumentParser(
+        description="Compute technical indicators for a stock"
+    )
     parser.add_argument("ticker", help="Stock ticker symbol (e.g., NVDA, AAPL)")
     parser.add_argument("--output", "-o", default=".", help="Output directory")
     args = parser.parse_args()

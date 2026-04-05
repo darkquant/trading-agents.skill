@@ -26,23 +26,27 @@ Use **web search** extensively to find:
 ## Analysis Framework
 
 ### Retail Sentiment
+
 - Overall mood on social media (bullish/bearish/mixed)
 - Volume of discussion (is the stock "hot" right now?)
 - Key narratives being pushed (what are retail investors focused on?)
 - Any meme stock dynamics or unusual retail interest
 
 ### Institutional & Analyst Sentiment
+
 - Recent analyst upgrades/downgrades
 - Consensus rating and average price target
 - Institutional ownership changes
 - Notable insider buying or selling
 
 ### Market-Wide Sentiment Context
+
 - Current fear/greed level
 - Sector-specific sentiment
 - Is the broader market risk-on or risk-off?
 
 ### Sentiment Divergences
+
 - Any disconnect between retail and institutional sentiment?
 - Sentiment vs. price action (contrarian signals)
 - Historical sentiment patterns for this stock
@@ -53,25 +57,32 @@ Save your report to `{OUTPUT_DIR}/sentiment_analysis.md`:
 
 ```markdown
 # Sentiment Analysis: {TICKER}
+
 **Date**: {DATE}
 **Analyst**: Sentiment Analyst Agent
 
 ## Summary
+
 [2-3 sentence sentiment overview]
 
 ## Retail Sentiment
+
 [Your findings from social media, forums]
 
 ## Institutional & Analyst Sentiment
+
 [Analyst ratings, institutional moves]
 
 ## Market-Wide Context
+
 [Broader sentiment environment]
 
 ## Notable Signals
+
 [Any contrarian indicators or divergences]
 
 ## Sentiment Signal: [BULLISH / BEARISH / NEUTRAL]
+
 **Confidence**: [HIGH / MEDIUM / LOW]
 **Key Driver**: [One sentence explaining the dominant sentiment factor]
 ```
@@ -88,6 +99,7 @@ At the end of your report, include a **数据来源 (Sources)** section:
 
 ```markdown
 ## 数据来源
+
 1. [Reddit r/wallstreetbets - 相关讨论帖](https://具体链接)
 2. [分析师评级来源](https://具体链接) — 评级变动详情
 3. [雪球/StockTwits/Twitter](https://具体链接) — 社交媒体情绪数据

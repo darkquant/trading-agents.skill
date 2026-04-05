@@ -46,6 +46,7 @@ Apply additional sector-specific risk checks as relevant:
 ### Risk Rating
 
 Assign a risk rating:
+
 - **LOW RISK**: Well-understood stock, reasonable sizing, clear stop loss, no imminent catalysts
 - **MEDIUM RISK**: Some elevated uncertainty but manageable with proper sizing
 - **HIGH RISK**: Significant uncertainty, binary events, or aggressive sizing proposed
@@ -61,26 +62,32 @@ Save your report to `{OUTPUT_DIR}/risk_assessment.md`:
 ## Overall Risk Rating: [LOW / MEDIUM / HIGH / EXCESSIVE]
 
 ## Position Risk Analysis
+
 - Proposed size: [from trader recommendation]
 - Recommended size: [your recommendation, if different]
 - Max acceptable loss: $X or Y% of portfolio
 
 ## Volatility Assessment
+
 - Recent daily volatility: X%
 - ATR-based stop: appropriate / too tight / too loose
 - Volatility relative to historical: elevated / normal / depressed
 
 ## Event Risk
+
 [Upcoming events that could cause large moves]
 
 ## Downside Scenarios
+
 | Scenario | Probability | Impact | Loss Estimate |
-|----------|------------|--------|---------------|
-| ...      | ...        | ...    | ...           |
+| -------- | ----------- | ------ | ------------- |
+| ...      | ...         | ...    | ...           |
 
 ## Risk Mitigation Recommendations
+
 [Suggestions to reduce risk: tighter stops, smaller size, hedges, timing adjustments]
 
 ## Risk Manager Decision: [APPROVE / APPROVE WITH MODIFICATIONS / REJECT]
+
 **Reasoning**: [Brief explanation]
 ```

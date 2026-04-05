@@ -11,9 +11,11 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured fundamental analy
 Use these tools to collect data, **prioritizing primary/first-hand sources**:
 
 1. **Run the market data script** to get financial statements and key metrics:
+
    ```bash
-   python {SKILL_PATH}/scripts/fetch_market_data.py {TICKER}
+   cd {SKILL_PATH} && uv run scripts/fetch_market_data.py {TICKER}
    ```
+
    This produces a JSON file with price history, income statement, balance sheet, cash flow, and key ratios.
 
 2. **Web search for primary sources** — always prioritize first-hand, authoritative data:
@@ -32,12 +34,14 @@ Use these tools to collect data, **prioritizing primary/first-hand sources**:
 Cover these areas in your report:
 
 ### Valuation
+
 - P/E ratio vs. industry average and historical range
 - P/S, P/B, EV/EBITDA ratios
 - DCF-implied fair value if enough data is available
 - Whether the stock appears overvalued, fairly valued, or undervalued
 
 ### Financial Health
+
 - Revenue growth trajectory (YoY, QoQ)
 - Profit margins (gross, operating, net) and trends
 - Free cash flow generation and consistency
@@ -45,12 +49,14 @@ Cover these areas in your report:
 - Return on equity and return on invested capital
 
 ### Earnings Quality
+
 - Revenue quality (recurring vs. one-time)
 - Earnings surprises history (beats/misses)
 - Guidance vs. consensus estimates
 - Any accounting concerns or red flags
 
 ### Competitive Position
+
 - Market share and competitive moat
 - Industry tailwinds or headwinds
 - Management quality signals (insider buying/selling, capital allocation track record)
@@ -97,25 +103,32 @@ Save your report to `{OUTPUT_DIR}/fundamental_analysis.md` with this structure:
 
 ```markdown
 # Fundamental Analysis: {TICKER}
+
 **Date**: {DATE}
 **Analyst**: Fundamental Analyst Agent
 
 ## Summary
+
 [2-3 sentence overall assessment]
 
 ## Valuation Assessment
+
 [Your findings]
 
 ## Financial Health
+
 [Your findings]
 
 ## Earnings Quality
+
 [Your findings]
 
 ## Competitive Position
+
 [Your findings]
 
 ## Fundamental Signal: [BULLISH / BEARISH / NEUTRAL]
+
 **Confidence**: [HIGH / MEDIUM / LOW]
 **Key Driver**: [One sentence explaining the primary reason for your signal]
 ```
@@ -128,6 +141,7 @@ At the end of your report, include a **数据来源 (Sources)** section listing 
 
 ```markdown
 ## 数据来源
+
 1. [公司名称 FY2025年报](https://具体链接) — 营收、利润、资产负债表数据
 2. [交易所公告/Filing](https://具体链接) — 季度业绩公告
 3. [Yahoo Finance / Bloomberg](https://具体链接) — 估值指标、分析师预期

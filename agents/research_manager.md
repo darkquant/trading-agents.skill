@@ -31,24 +31,31 @@ Save your report to `{OUTPUT_DIR}/research_summary.md`:
 
 ```markdown
 # Research Summary: {TICKER}
+
 **Research Manager Assessment**
 
 ## Debate Overview
+
 [Brief summary of what each side argued]
 
 ## Strongest Bull Arguments
+
 [The 2-3 bull arguments that survived scrutiny]
 
 ## Strongest Bear Arguments
+
 [The 2-3 bear arguments that survived scrutiny]
 
 ## Resolved Questions
+
 [Points where one side convincingly won]
 
 ## Open Questions
+
 [Genuine uncertainties that the debate didn't resolve]
 
 ## Research Conclusion
+
 **Lean**: [BULLISH / BEARISH / NEUTRAL]
 **Conviction**: [HIGH / MEDIUM / LOW]
 **Key Consideration**: [The single most important factor for the trading decision]

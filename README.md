@@ -30,20 +30,20 @@ When you ask Claude Code to analyze a stock, the skill deploys a swarm of subage
                                        |
                                  Risk Manager              Stage 4
                                        |
-                              Portfolio Manager             Stage 5
+                              Portfolio Manager            Stage 5
                                        |
                               Final Recommendation
 ```
 
 ### The Five Stages
 
-| Stage | Agents | What Happens |
-|-------|--------|--------------|
-| **1. Analysis** | Fundamental, Technical, Sentiment, News Analysts | Four analysts run **in parallel**, each gathering data through web search and yfinance, producing structured reports. |
-| **2. Research Debate** | Bull Researcher, Bear Researcher, Research Manager | Bull and bear researchers argue in configurable rounds (default: 1). A research manager then synthesizes the debate into a balanced summary. |
-| **3. Trading Decision** | Trader | Synthesizes all reports into a concrete BUY / SELL / HOLD recommendation with entry/exit points and position sizing. |
-| **4. Risk Review** | Risk Manager | Evaluates position risk, volatility, event risk, concentration risk, and downside scenarios. |
-| **5. Portfolio Approval** | Portfolio Manager | Makes the final APPROVE / MODIFY / REJECT decision, considering the full picture. |
+| Stage                     | Agents                                             | What Happens                                                                                                                                 |
+| ------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Analysis**           | Fundamental, Technical, Sentiment, News Analysts   | Four analysts run **in parallel**, each gathering data through web search and yfinance, producing structured reports.                        |
+| **2. Research Debate**    | Bull Researcher, Bear Researcher, Research Manager | Bull and bear researchers argue in configurable rounds (default: 1). A research manager then synthesizes the debate into a balanced summary. |
+| **3. Trading Decision**   | Trader                                             | Synthesizes all reports into a concrete BUY / SELL / HOLD recommendation with entry/exit points and position sizing.                         |
+| **4. Risk Review**        | Risk Manager                                       | Evaluates position risk, volatility, event risk, concentration risk, and downside scenarios.                                                 |
+| **5. Portfolio Approval** | Portfolio Manager                                  | Makes the final APPROVE / MODIFY / REJECT decision, considering the full picture.                                                            |
 
 ## Installation
 
@@ -58,9 +58,7 @@ Add this skill to your Claude Code configuration. In your project's `.claude/set
 
 ```json
 {
-  "skills": [
-    "/path/to/trading-agents.skill"
-  ]
+  "skills": ["/path/to/trading-agents.skill"]
 }
 ```
 
@@ -75,22 +73,26 @@ Just ask Claude Code to analyze a stock. The skill triggers automatically when y
 ### Example Prompts
 
 **Basic analysis:**
+
 ```
 Analyze NVDA for me. Is now a good time to buy?
 ```
 
 **With debate rounds:**
+
 ```
 Run a full analysis on TSLA with 3 rounds of bull/bear debate.
 ```
 
 **With investor context:**
+
 ```
 Analyze AAPL. I'm a conservative investor with a long-term horizon
 and I already hold several tech stocks.
 ```
 
 **In Chinese:**
+
 ```
 帮我分析一下特斯拉（TSLA）的股票，我想知道现在该买入还是卖出。
 ```
@@ -117,18 +119,18 @@ and I already hold several tech stocks.
 
 ## Agents
 
-| Agent | Role | Data Sources |
-|-------|------|-------------|
-| **Fundamental Analyst** | Evaluates financial health, valuation, earnings quality, competitive position | yfinance, SEC filings, company IR pages, earnings reports |
-| **Technical Analyst** | Analyzes price patterns, momentum indicators, volume, volatility | yfinance, technical indicators script, chart pattern analysis |
-| **Sentiment Analyst** | Gauges market mood from social media, analyst ratings, institutional flows | Reddit, Twitter/X, StockTwits, analyst reports, 13F filings |
-| **News Analyst** | Evaluates recent news, macro events, industry developments, upcoming catalysts | Reuters, Bloomberg, FT, WSJ, company announcements |
-| **Bull Researcher** | Builds the strongest possible case FOR the investment | All analyst reports + previous debate rounds |
-| **Bear Researcher** | Builds the strongest possible case AGAINST the investment | All analyst reports + previous debate rounds |
-| **Research Manager** | Objectively synthesizes the bull/bear debate | Debate transcripts + analyst reports |
-| **Trader** | Produces actionable BUY/SELL/HOLD with position sizing | All reports + research summary |
-| **Risk Manager** | Evaluates risk: position size, volatility, events, tail risk | Trading recommendation + all reports |
-| **Portfolio Manager** | Final decision maker: APPROVE / MODIFY / REJECT | Everything above |
+| Agent                   | Role                                                                           | Data Sources                                                  |
+| ----------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| **Fundamental Analyst** | Evaluates financial health, valuation, earnings quality, competitive position  | yfinance, SEC filings, company IR pages, earnings reports     |
+| **Technical Analyst**   | Analyzes price patterns, momentum indicators, volume, volatility               | yfinance, technical indicators script, chart pattern analysis |
+| **Sentiment Analyst**   | Gauges market mood from social media, analyst ratings, institutional flows     | Reddit, Twitter/X, StockTwits, analyst reports, 13F filings   |
+| **News Analyst**        | Evaluates recent news, macro events, industry developments, upcoming catalysts | Reuters, Bloomberg, FT, WSJ, company announcements            |
+| **Bull Researcher**     | Builds the strongest possible case FOR the investment                          | All analyst reports + previous debate rounds                  |
+| **Bear Researcher**     | Builds the strongest possible case AGAINST the investment                      | All analyst reports + previous debate rounds                  |
+| **Research Manager**    | Objectively synthesizes the bull/bear debate                                   | Debate transcripts + analyst reports                          |
+| **Trader**              | Produces actionable BUY/SELL/HOLD with position sizing                         | All reports + research summary                                |
+| **Risk Manager**        | Evaluates risk: position size, volatility, events, tail risk                   | Trading recommendation + all reports                          |
+| **Portfolio Manager**   | Final decision maker: APPROVE / MODIFY / REJECT                                | Everything above                                              |
 
 ## Helper Scripts
 
