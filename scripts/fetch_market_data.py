@@ -39,7 +39,8 @@ def _retry(func, description: str, retries: int = MAX_RETRIES):
 
 def _detect_market(ticker: str) -> str:
     """Detect which market a ticker belongs to.
-    Returns one of: 'hk', 'us', 'cn_sh', 'cn_sz', 'unknown'.
+    Returns one of: 'hk', 'us', 'cn_sh', 'cn_sz'.
+    Unrecognized formats default to 'us'.
     """
     t = ticker.upper().strip()
     # Hong Kong: 0883.HK, 1810.HK, 00700.HK
