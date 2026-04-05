@@ -1,0 +1,23 @@
+{
+  "skill_name": "trading-agents",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm thinking about buying NVDA. Can you run a full analysis with your trading agents? I want to know if now is a good time to enter a position.",
+      "expected_output": "A comprehensive multi-agent analysis of NVDA including analyst reports, bull/bear debate, trading recommendation, risk assessment, and portfolio manager decision, with both a report file and conversational summary.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "帮我分析一下特斯拉（TSLA）的股票，我想知道现在该买入还是卖出。请用2轮辩论。",
+      "expected_output": "A full TradingAgents analysis of TSLA with 2 rounds of bull/bear debate, producing analyst reports, research debate, trading recommendation, risk review, and final decision. The response should handle the Chinese language request gracefully.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Run your trading agents on AAPL. I'm a conservative investor with a long-term horizon. I already hold some tech stocks so I'm worried about concentration risk.",
+      "expected_output": "A full analysis of AAPL that takes into account the user's conservative risk profile and existing tech exposure. The risk manager should specifically address concentration risk, and the portfolio manager should factor in the user's investment style.",
+      "files": []
+    }
+  ]
+}
