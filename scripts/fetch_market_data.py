@@ -8,20 +8,39 @@ Usage: python fetch_market_data.py TICKER [--output OUTPUT_DIR]
 
 import argparse
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 
 import yfinance as yf
 
+MAX_RETRIES = 3
+RETRY_DELAY_SECONDS = 2
+
+
+def _retry(func, description: str, retries: int = MAX_RETRIES):
+    """Retry a callable with exponential backoff. Returns result or raises last exception."""
+    last_error = None
+    for attempt in range(1, retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            last_error = e
+            if attempt < retries:
+                delay = RETRY_DELAY_SECONDS * (2 ** (attempt - 1))
+                print(f"  Retry {attempt}/{retries} for {description} (waiting {delay}s): {e}")
+                time.sleep(delay)
+    raise last_error
+
 
 def fetch_data(ticker: str) -> dict:
-    """Fetch comprehensive market data for a ticker."""
+    """Fetch comprehensive market data for a ticker with retry logic."""
     stock = yf.Ticker(ticker)
     result = {"ticker": ticker, "fetched_at": datetime.now().isoformat(), "errors": []}
 
     # Basic info
     try:
-        info = stock.info
+        info = _retry(lambda: stock.info, "basic info")
         result["info"] = {
             "name": info.get("longName", "N/A"),
             "sector": info.get("sector", "N/A"),
@@ -83,7 +102,7 @@ def fetch_data(ticker: str) -> dict:
 
     # Price history (6 months daily)
     try:
-        hist = stock.history(period="6mo", interval="1d")
+        hist = _retry(lambda: stock.history(period="6mo", interval="1d"), "price history")
         if not hist.empty:
             recent = hist.tail(60)  # Last ~60 trading days
             result["price_history"] = {
@@ -115,7 +134,7 @@ def fetch_data(ticker: str) -> dict:
                 ],
             }
             # 52-week data
-            hist_1y = stock.history(period="1y", interval="1d")
+            hist_1y = _retry(lambda: stock.history(period="1y", interval="1d"), "52-week history")
             if not hist_1y.empty:
                 result["price_history"]["week_52_high"] = float(hist_1y["High"].max())
                 result["price_history"]["week_52_low"] = float(hist_1y["Low"].min())
@@ -124,7 +143,7 @@ def fetch_data(ticker: str) -> dict:
 
     # Income statement
     try:
-        income = stock.income_stmt
+        income = _retry(lambda: stock.income_stmt, "income statement")
         if income is not None and not income.empty:
             result["income_statement"] = {}
             for col in income.columns[:4]:  # Last 4 periods
@@ -140,7 +159,7 @@ def fetch_data(ticker: str) -> dict:
 
     # Balance sheet
     try:
-        balance = stock.balance_sheet
+        balance = _retry(lambda: stock.balance_sheet, "balance sheet")
         if balance is not None and not balance.empty:
             result["balance_sheet"] = {}
             for col in balance.columns[:4]:
@@ -155,7 +174,7 @@ def fetch_data(ticker: str) -> dict:
 
     # Cash flow
     try:
-        cashflow = stock.cashflow
+        cashflow = _retry(lambda: stock.cashflow, "cash flow")
         if cashflow is not None and not cashflow.empty:
             result["cash_flow"] = {}
             for col in cashflow.columns[:4]:
@@ -202,7 +221,23 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"Fetching market data for {ticker}...")
-    data = fetch_data(ticker)
+    try:
+        data = fetch_data(ticker)
+    except Exception as e:
+        # Total failure — write a minimal JSON so the agent knows to fall back to web search
+        data = {
+            "ticker": ticker,
+            "fetched_at": datetime.now().isoformat(),
+            "errors": [f"CRITICAL: All retries failed — {e}"],
+            "fallback_required": True,
+        }
+        output_file = output_dir / f"{ticker}_market_data.json"
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+        print(f"ERROR: Could not fetch data for {ticker} after {MAX_RETRIES} retries.")
+        print(f"Partial result saved to {output_file}")
+        print("FALLBACK: Use web search to obtain market data for this ticker.")
+        return
 
     output_file = output_dir / f"{ticker}_market_data.json"
     with open(output_file, "w") as f:
@@ -211,12 +246,15 @@ def main():
     print(f"Data saved to {output_file}")
     if data["errors"]:
         print(f"Warnings: {', '.join(data['errors'])}")
+        print("NOTE: Some data sections failed. Use web search to supplement missing data.")
 
     # Print summary
     if "price_history" in data:
         ph = data["price_history"]
-        print(f"\nCurrent Price: ${ph.get('current_price', 'N/A')}")
+        print(f"\nCurrent Price: {ph.get('current_price', 'N/A')}")
         print(f"Daily Change: {ph.get('daily_change_pct', 'N/A'):.2f}%")
+    else:
+        print("\nWARNING: Price history unavailable. Use web search for current price.")
     if "valuation" in data:
         v = data["valuation"]
         print(f"P/E (trailing): {v.get('pe_trailing', 'N/A')}")

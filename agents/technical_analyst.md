@@ -24,6 +24,12 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured technical analysi
 
 3. **Web search** for recent technical analysis commentary on the stock if helpful.
 
+> **Fallback when scripts fail**: If either script fails or returns `"fallback_required": true`, you MUST use web search to gather the data instead. Do NOT produce a report without price data.
+>
+> - Search for `{TICKER} stock price history` and `{TICKER} technical analysis` to get recent price levels, moving averages, RSI, and MACD values from sources like TradingView, Investing.com, or MarketWatch.
+> - Search for `{TICKER} stock price today` from at least two sources to verify the current price.
+> - You can still compute basic indicators manually if you obtain at least 20-60 days of closing prices from web search results.
+
 ## Analysis Framework
 
 ### Trend Analysis

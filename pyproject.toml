@@ -1,9 +1,9 @@
 [project]
 name = "trading-agents-skill"
 version = "0.1.0"
-description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+description = "Multi-agent trading analysis pipeline orchestrating 10+ Claude subagents to simulate professional trading firm analysis, debates, and portfolio decisions"
 dependencies = [
     "akshare>=1.18.51",
     "numpy>=2.0.2",

@@ -8,11 +8,30 @@ Usage: python technical_indicators.py TICKER [--output OUTPUT_DIR]
 
 import argparse
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 import yfinance as yf
+
+MAX_RETRIES = 3
+RETRY_DELAY_SECONDS = 2
+
+
+def _retry(func, description: str, retries: int = MAX_RETRIES):
+    """Retry a callable with exponential backoff. Returns result or raises last exception."""
+    last_error = None
+    for attempt in range(1, retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            last_error = e
+            if attempt < retries:
+                delay = RETRY_DELAY_SECONDS * (2 ** (attempt - 1))
+                print(f"  Retry {attempt}/{retries} for {description} (waiting {delay}s): {e}")
+                time.sleep(delay)
+    raise last_error
 
 
 def sma(data, period):
@@ -78,10 +97,10 @@ def compute_indicators(ticker: str) -> dict:
     import pandas as pd
 
     stock = yf.Ticker(ticker)
-    hist = stock.history(period="1y", interval="1d")
+    hist = _retry(lambda: stock.history(period="1y", interval="1d"), "price history")
 
     if hist.empty:
-        return {"ticker": ticker, "error": "No price data available"}
+        return {"ticker": ticker, "error": "No price data available", "fallback_required": True}
 
     close = hist["Close"]
     high = hist["High"]
@@ -298,7 +317,22 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"Computing technical indicators for {ticker}...")
-    data = compute_indicators(ticker)
+    try:
+        data = compute_indicators(ticker)
+    except Exception as e:
+        data = {
+            "ticker": ticker,
+            "computed_at": datetime.now().isoformat(),
+            "error": f"CRITICAL: All retries failed — {e}",
+            "fallback_required": True,
+        }
+        output_file = output_dir / f"{ticker}_technical_indicators.json"
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+        print(f"ERROR: Could not compute indicators for {ticker} after {MAX_RETRIES} retries.")
+        print(f"Partial result saved to {output_file}")
+        print("FALLBACK: Use web search to obtain price data and compute indicators manually.")
+        return
 
     output_file = output_dir / f"{ticker}_technical_indicators.json"
     with open(output_file, "w") as f:
@@ -308,12 +342,15 @@ def main():
 
     # Print summary
     if "error" not in data:
-        print(f"\nCurrent Price: ${data['current']['price']}")
+        print(f"\nCurrent Price: {data['current']['price']}")
         print(f"RSI(14): {data['rsi']['value']} ({data['rsi']['signal']})")
         print(f"MACD Signal: {data['macd']['signal']}")
         if "ma_alignment" in data:
             print(f"MA Alignment: {data['ma_alignment']}")
         print(f"Overall: {data['overall_technical_signal']['summary']}")
+    else:
+        print(f"\nWARNING: {data['error']}")
+        print("FALLBACK: Use web search to obtain price data and compute indicators manually.")
 
 
 if __name__ == "__main__":

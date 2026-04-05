@@ -31,7 +31,7 @@ Agent prompts use `{TICKER}`, `{DATE}`, `{SKILL_PATH}`, and `{OUTPUT_DIR}` as te
 This skill requires **Python**, **pip**, and **uv** preinstalled. Before running any analysis:
 
 ```bash
-pip install -U uv   # Install/upgrade uv
+pip install -U uv  # Install/upgrade uv
 uv sync            # Install project dependencies from pyproject.toml
 ```
 

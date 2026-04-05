@@ -18,11 +18,15 @@ Use these tools to collect data, **prioritizing primary/first-hand sources**:
 
    This produces a JSON file with price history, income statement, balance sheet, cash flow, and key ratios.
 
+   > **If the script fails or returns partial data** (look for `"fallback_required": true` in the JSON, or `FALLBACK` in the console output), **you MUST use web search to obtain the missing data**. Do not skip data gathering — switch to step 2 immediately. Common failure modes include network restrictions blocking Yahoo Finance. This is expected; web search is your reliable fallback.
+
 2. **Web search for primary sources** — always prioritize first-hand, authoritative data:
    - **Company official sources**: investor relations pages, annual/quarterly reports, earnings press releases
    - **Stock exchange filings**: SEC EDGAR (US), HKEX (HK), SSE/SZSE (China A-shares), SGX, etc.
    - **Regulatory filings**: 10-K, 10-Q, 8-K (US); annual reports, interim reports (HK/CN)
    - Only use analyst estimates and third-party data as supplements, not primary sources
+
+   > **IMPORTANT**: If the market data script failed, web search becomes your **primary** data source. Search for: `{TICKER} stock price today`, `{TICKER} financial statements`, `{TICKER} key ratios PE ratio market cap`. Verify the current price from at least two sources (e.g., Google Finance, Bloomberg, stock exchange website).
 
 3. **For every data point you cite**, record:
    - The **source name** and a **clickable URL** so the reader can verify
