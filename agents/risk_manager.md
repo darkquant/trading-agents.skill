@@ -24,6 +24,25 @@ Review the trading recommendation for **{TICKER}** and assess whether the risk i
 6. **Correlation Risk**: Does this position correlate highly with existing holdings?
 7. **Tail Risk**: What's the worst-case scenario, and can we survive it?
 
+### Industry-Specific Risk Metrics
+
+Apply additional sector-specific risk checks as relevant:
+
+- **Banking / Financial services**:
+  - Capital adequacy ratio (CAR) — is it well above the regulatory minimum (e.g., 10.5% for Basel III)?
+  - Non-performing loan (NPL) ratio — is it trending up or down? Compare to peers.
+  - Provision coverage ratio (拨备覆盖率) — is the bank adequately reserved (>150% is generally healthy)?
+  - Net interest margin (NIM) compression risk in rate-cut cycles
+  - Interbank/wholesale funding reliance and liquidity coverage ratio (LCR)
+
+- **Insurance**: Solvency ratio, investment portfolio duration mismatch, catastrophe exposure
+
+- **E-commerce / Internet**: GMV growth deceleration risk, regulatory risk (antitrust), user churn
+
+- **Consumer electronics / Hardware**: Inventory buildup, supply chain single-point-of-failure, product cycle risk
+
+- **Automotive / EV**: Delivery miss risk, warranty/recall liability, raw material price risk (lithium, cobalt)
+
 ### Risk Rating
 
 Assign a risk rating:
