@@ -4,7 +4,7 @@ Compute technical indicators for a given stock ticker.
 Primary source: yfinance. Fallback: akshare (for HK, US, and A-share stocks).
 Outputs a JSON file with RSI, MACD, Bollinger Bands, moving averages, and more.
 
-Usage: python technical_indicators.py TICKER [--output OUTPUT_DIR]
+Usage: uv run scripts/technical_indicators.py TICKER [--output OUTPUT_DIR]
 """
 
 import argparse

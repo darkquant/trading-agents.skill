@@ -35,7 +35,7 @@ Use these tools to collect data, **prioritizing primary/first-hand sources**:
    > - **新浪财经**: `https://finance.sina.com.cn/` — 实时行情、公司公告
    > - **Google Finance**: `https://www.google.com/finance/quote/{TICKER}` — 快速验证当前价格
    >
-   > Search for: `{TICKER} stock price today site:xueqiu.com`, `{TICKER} financial statements site:finance.yahoo.com`, `{TICKER} 财务数据 site:eastmoney.com`. **Verify the current price from at least two个不同来源。**
+   > Search for: `{TICKER} stock price today site:xueqiu.com`, `{TICKER} financial statements site:finance.yahoo.com`, `{TICKER} 财务数据 site:eastmoney.com`. **Verify the current price from at least two different sources.**
 
 3. **For every data point you cite**, record:
    - The **source name** and a **clickable URL** so the reader can verify
