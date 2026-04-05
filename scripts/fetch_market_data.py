@@ -4,7 +4,7 @@ Fetch market data for a given stock ticker.
 Primary source: yfinance. Fallback: akshare (for HK, US, and A-share stocks).
 Outputs a comprehensive JSON file with price history, financial statements, and key metrics.
 
-Usage: python fetch_market_data.py TICKER [--output OUTPUT_DIR]
+Usage: uv run scripts/fetch_market_data.py TICKER [--output OUTPUT_DIR]
 """
 
 import argparse
@@ -285,7 +285,6 @@ def _fetch_akshare_hist(ticker: str, market: str, days: int = 365) -> "pd.DataFr
     # Normalize column names
     df = df.rename(columns=_AK_HIST_COLS)
     # Ensure standard columns exist (US daily from sina has different column names)
-    col_map_us = {"open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume"}
     for std_col in ["date", "open", "high", "low", "close", "volume"]:
         if std_col not in df.columns:
             # Try case-insensitive match
