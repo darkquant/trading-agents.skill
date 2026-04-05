@@ -9,7 +9,6 @@ Usage: uv run scripts/technical_indicators.py TICKER [--output OUTPUT_DIR]
 
 import argparse
 import json
-import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -239,7 +238,13 @@ def compute_indicators(hist: pd.DataFrame, ticker: str, source: str) -> dict:
         "signal_line": round(float(signal_line.iloc[-1]), 4),
         "histogram": round(float(histogram.iloc[-1]), 4),
         "signal": "BULLISH" if float(macd_line.iloc[-1]) > float(signal_line.iloc[-1]) else "BEARISH",
-        "histogram_direction": "EXPANDING" if abs(float(histogram.iloc[-1])) > abs(float(histogram.iloc[-2])) else "CONTRACTING",
+        "histogram_direction": (
+            "EXPANDING"
+            if abs(float(histogram.iloc[-1])) > abs(float(histogram.iloc[-2]))
+            else "CONTRACTING"
+        )
+        if len(histogram) >= 2
+        else "UNKNOWN",
     }
 
     # Check for MACD crossover
