@@ -24,16 +24,15 @@ that reflects diverse analytical perspectives.
 
 ## Prerequisites
 
-This skill requires **Python**, **pip**, and **uv** to be installed on the system. Before running
-any analysis, set up the Python environment:
+This skill requires **Python 3.10 or newer**, **pip**, and **uv** to be installed on the system.
+Before running any analysis, set up the Python environment:
 
-1. Install uv (if not already installed):
+1. Make sure `python3` and `pip` point to Python 3.10+.
+
+2. Install uv (if not already installed):
 
    ```bash
    pip install -U uv
-   ```
-
-2. Sync the project dependencies from the skill directory:
    ```bash
    cd {SKILL_PATH} && uv sync
    ```
