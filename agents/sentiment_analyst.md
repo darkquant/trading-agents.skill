@@ -10,11 +10,18 @@ Analyze sentiment for **{TICKER}** as of **{DATE}** and produce a structured sen
 
 Use **web search** extensively to find:
 
-1. **Social media sentiment**: Search for discussions about the stock on Reddit (r/wallstreetbets, r/stocks, r/investing), Twitter/X, StockTwits
-2. **Retail investor sentiment**: Search for "{TICKER} stock sentiment", "{TICKER} stock reddit", "{TICKER} stock opinion"
-3. **Analyst sentiment**: Search for recent analyst ratings, upgrades/downgrades, price target changes
-4. **Institutional sentiment**: Search for recent institutional buying/selling, 13F filings, insider transactions
-5. **Fear/greed indicators**: Search for current market-wide sentiment (VIX, put/call ratio, Fear & Greed Index)
+1. **雪球 (Xueqiu) — primary source for Chinese/HK stocks**:
+   - Search `site:xueqiu.com {TICKER}` or `雪球 {TICKER}` to find the stock's Xueqiu page
+   - Check: follower count (关注人数), recent discussion volume, trending posts
+   - Look for notable big-V (大V) opinions and their follower counts
+   - Check Xueqiu's sentiment polls or hot topic rankings if available
+   - For US-listed Chinese ADRs (e.g., PDD, BABA), also check Xueqiu's US stock section
+2. **Social media sentiment**: Reddit (r/wallstreetbets, r/stocks, r/investing), Twitter/X, StockTwits
+3. **Chinese investor platforms** (for HK/CN/Chinese ADR stocks): 东方财富 (eastmoney.com) stock bar (股吧), 同花顺 (10jqka.com.cn) community
+4. **Retail investor sentiment**: Search for "{TICKER} stock sentiment", "{TICKER} stock reddit", "{TICKER} stock opinion"
+5. **Analyst sentiment**: Search for recent analyst ratings, upgrades/downgrades, price target changes
+6. **Institutional sentiment**: Search for recent institutional buying/selling, 13F filings, insider transactions
+7. **Fear/greed indicators**: Search for current market-wide sentiment (VIX, put/call ratio, Fear & Greed Index)
 
 ## Analysis Framework
 
@@ -87,4 +94,4 @@ At the end of your report, include a **数据来源 (Sources)** section:
 4. [机构持仓数据来源](https://具体链接) — 13F 或 CCASS 数据
 ```
 
-For Chinese stocks, also check: 雪球 (xueqiu.com), 东方财富 (eastmoney.com), 同花顺 (10jqka.com.cn) for retail sentiment data.
+For Chinese/HK stocks and US-listed Chinese ADRs, **雪球 (xueqiu.com) is your most important sentiment source** — always search it first. Also check: 东方财富 (eastmoney.com) 股吧, 同花顺 (10jqka.com.cn) for additional retail sentiment data.

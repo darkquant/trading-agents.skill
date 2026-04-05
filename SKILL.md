@@ -177,10 +177,20 @@ All analyst reports must meet these standards:
   publication date and a clickable link.
 
 - **Sentiment claims must be attributed** to specific sources with links, not vague statements
-  like "market sentiment is bullish."
+  like "market sentiment is bullish." For Chinese/HK stocks, 雪球 (xueqiu.com) should be
+  the primary sentiment data source.
 
 - **Technical indicators must include plain-language explanations** so non-expert readers
   can understand what each indicator means and why it matters.
+
+- **Industry-specific analysis is required**: Analysts and risk managers must go beyond
+  generic metrics and cover sector-specific KPIs. For example:
+  - Banking: capital adequacy ratio, NPL ratio, provision coverage ratio, NIM
+  - E-commerce: GMV, take rate, MAU/DAU, customer acquisition cost
+  - Consumer electronics: supply chain, market share trends, component cost analysis
+  - Automotive/EV: monthly delivery/sales data (12–36 months), competitive comparison
+  - Insurance: NBV, embedded value, combined ratio, solvency ratio
+  - Multi-segment companies: break down by segment with relevant industry metrics for each
 
 ## Important Notes
 

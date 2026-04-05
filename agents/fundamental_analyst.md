@@ -55,6 +55,42 @@ Cover these areas in your report:
 - Industry tailwinds or headwinds
 - Management quality signals (insider buying/selling, capital allocation track record)
 
+### Industry-Specific Deep Dive
+
+Tailor your analysis to the company's sector. Include whichever of the following apply:
+
+- **Consumer electronics / Hardware** (e.g., smartphone, semiconductor):
+  - Supply chain analysis: key suppliers, component costs, supply constraints
+  - Market share trends among top players for the last several quarters
+  - Product cycle timing and ASP (average selling price) trends
+
+- **Automotive / EV**:
+  - Monthly delivery and sales figures for at least the last 12–36 months
+  - Competitive landscape: how do monthly deliveries compare to peers?
+  - Order backlog, production capacity, and factory utilization
+
+- **E-commerce / Internet retail** (e.g., PDD, JD, Amazon):
+  - GMV (Gross Merchandise Volume) trend, ideally quarterly or annually
+  - Take rate, monetization rate, and ARPU trends
+  - User growth (MAU/DAU), buyer frequency, customer acquisition cost
+
+- **Banking / Financial services**:
+  - Capital adequacy ratio (CAR) and CET1 ratio
+  - Non-performing loan (NPL) ratio and trend
+  - Provision coverage ratio (拨备覆盖率)
+  - Net interest margin (NIM) and fee income ratio
+  - Loan-to-deposit ratio
+
+- **Insurance**:
+  - New business value (NBV) and embedded value (EV)
+  - Combined ratio, loss ratio, expense ratio
+  - Investment return on insurance float
+  - Solvency ratio
+
+- **Conglomerate / Multi-segment companies**: Break down revenue and profit by segment; apply the appropriate sector lens to each.
+
+If the company spans multiple segments (e.g., Xiaomi = smartphones + IoT + EVs), analyze each segment with the relevant industry framework.
+
 ## Output Format
 
 Save your report to `{OUTPUT_DIR}/fundamental_analysis.md` with this structure:
