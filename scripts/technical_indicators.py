@@ -104,11 +104,19 @@ def _fetch_hist_yfinance(ticker: str) -> pd.DataFrame:
 
 def _fetch_hist_akshare(ticker: str) -> pd.DataFrame:
     """Fetch ~1 year daily history via akshare. Returns DataFrame normalized to Close/High/Low/Volume columns."""
-    # Import ticker utilities from our sibling module
-    script_dir = Path(__file__).parent
-    sys.path.insert(0, str(script_dir))
-    from fetch_market_data import _detect_market, _fetch_akshare_hist
+    # Import ticker utilities from our sibling module without mutating sys.path
+    import importlib.util
 
+    script_dir = Path(__file__).parent
+    module_path = script_dir / "fetch_market_data.py"
+    spec = importlib.util.spec_from_file_location("fetch_market_data", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load module from {module_path}")
+
+    fetch_market_data = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fetch_market_data)
+    _detect_market = fetch_market_data._detect_market
+    _fetch_akshare_hist = fetch_market_data._fetch_akshare_hist
     market = _detect_market(ticker)
     df = _fetch_akshare_hist(ticker, market, days=365)
     if df is None or df.empty:
