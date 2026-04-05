@@ -7,20 +7,20 @@
 # 文档：https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # 默认所有者（兜底规则，覆盖所有文件）
-*                   @darkquant
+*                   @huahang
 
 # Skill 核心文件
-SKILL.md            @darkquant
-CLAUDE.md           @darkquant
+SKILL.md            @huahang
+CLAUDE.md           @huahang
 
 # 智能体提示词
-agents/             @darkquant
+agents/             @huahang
 
 # Python 脚本
-scripts/            @darkquant
+scripts/            @huahang
 
 # 评估测试
-evals/              @darkquant
+evals/              @huahang
 
 # GitHub 工作流配置本身也需要所有者审核
-.github/            @darkquant
+.github/            @huahang
