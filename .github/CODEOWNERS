@@ -1,0 +1,26 @@
+# CODEOWNERS
+# 指定代码审查负责人。当 PR 修改了以下路径的文件时，
+# 对应的所有者会被自动添加为 Required Reviewer。
+# 配合仓库的 "Require review from Code Owners" 分支保护规则使用。
+#
+# 语法：<路径模式>  <GitHub 用户名或团队>
+# 文档：https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# 默认所有者（兜底规则，覆盖所有文件）
+*                   @darkquant
+
+# Skill 核心文件
+SKILL.md            @darkquant
+CLAUDE.md           @darkquant
+
+# 智能体提示词
+agents/             @darkquant
+
+# Python 脚本
+scripts/            @darkquant
+
+# 评估测试
+evals/              @darkquant
+
+# GitHub 工作流配置本身也需要所有者审核
+.github/            @darkquant
