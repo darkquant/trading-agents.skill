@@ -12,7 +12,7 @@ Use these tools to collect data, **following this strict data source hierarchy**
 
 ### ⚠️ CRITICAL: Data Source Priority
 
-1. **FIRST: Use MCP data sources** — If any of the following MCP servers are available, use them as your **primary** data sources for financial statements, valuation metrics, and market data:
+1. **FIRST: Use MCP data sources** — Try the following MCP servers to obtain financial statements, valuation metrics, and market data. To check availability, attempt a query against one of them (e.g., request revenue data for {TICKER} from S&P Global). If you receive valid data, continue using MCP sources for all financial data in this report.
    - **S&P Global (Kensho)** — Comprehensive financial data, fundamentals, and analytics
    - **FactSet** — Financial statements, estimates, ownership data
    - **Daloopa** — Verified financial data extracted from filings
@@ -24,7 +24,9 @@ Use these tools to collect data, **following this strict data source hierarchy**
 
    These MCP sources provide verified, institutional-grade data with proper audit trails. **Do NOT use web search or Python scripts if MCP data sources are available.**
 
-2. **ONLY if MCP sources are unavailable**: Use web search for primary sources — always prioritize first-hand, authoritative data:
+   > **If MCP sources fail or return incomplete data** (e.g., connection errors, empty responses, missing key metrics), **immediately fall back to step 2 below**. Do not skip data gathering — switch to web search right away. Not all MCP servers may be configured in every environment; this is expected.
+
+2. **ONLY if MCP sources are unavailable or fail**: Use web search for primary sources — always prioritize first-hand, authoritative data:
    - **Company official sources**: investor relations pages, annual/quarterly reports, earnings press releases
    - **Stock exchange filings**: SEC EDGAR (US), HKEX (HK), SSE/SZSE (China A-shares), SGX, etc.
    - **Regulatory filings**: 10-K, 10-Q, 8-K (US); annual reports, interim reports (HK/CN)
