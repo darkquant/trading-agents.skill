@@ -12,7 +12,7 @@
 
 ### 涉及的文件 / 模块
 
-> 列出主要改动的文件或模块，例如：`agents/fundamental_analyst.md`、`scripts/fetch_market_data.py`
+> 列出主要改动的文件或模块，例如：`agents/fundamental_analyst.md`、`scripts/technical_indicators.py`
 
 -
 

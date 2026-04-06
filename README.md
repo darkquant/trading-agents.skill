@@ -39,7 +39,7 @@ When you ask Claude Code to analyze a stock, the skill deploys a swarm of subage
 
 | Stage                     | Agents                                             | What Happens                                                                                                                                 |
 | ------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1. Analysis**           | Fundamental, Technical, Sentiment, News Analysts   | Four analysts run **in parallel**, each gathering data through web search and yfinance, producing structured reports.                        |
+| **1. Analysis**           | Fundamental, Technical, Sentiment, News Analysts   | Four analysts run **in parallel**, each gathering data through MCP data sources, web search, and yfinance, producing structured reports.                        |
 | **2. Research Debate**    | Bull Researcher, Bear Researcher, Research Manager | Bull and bear researchers argue in configurable rounds (default: 1). A research manager then synthesizes the debate into a balanced summary. |
 | **3. Trading Decision**   | Trader                                             | Synthesizes all reports into a concrete BUY / SELL / HOLD recommendation with entry/exit points and position sizing.                         |
 | **4. Risk Review**        | Risk Manager                                       | Evaluates position risk, volatility, event risk, concentration risk, and downside scenarios.                                                 |
@@ -121,7 +121,7 @@ and I already hold several tech stocks.
 
 | Agent                   | Role                                                                           | Data Sources                                                  |
 | ----------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| **Fundamental Analyst** | Evaluates financial health, valuation, earnings quality, competitive position  | yfinance, SEC filings, company IR pages, earnings reports     |
+| **Fundamental Analyst** | Evaluates financial health, valuation, earnings quality, competitive position  | MCP data sources (S&P Global, FactSet, Daloopa, Morningstar, LSEG), SEC filings, company IR pages |
 | **Technical Analyst**   | Analyzes price patterns, momentum indicators, volume, volatility               | yfinance, technical indicators script, chart pattern analysis |
 | **Sentiment Analyst**   | Gauges market mood from social media, analyst ratings, institutional flows     | Reddit, Twitter/X, StockTwits, analyst reports, 13F filings   |
 | **News Analyst**        | Evaluates recent news, macro events, industry developments, upcoming catalysts | Reuters, Bloomberg, FT, WSJ, company announcements            |
@@ -134,17 +134,14 @@ and I already hold several tech stocks.
 
 ## Helper Scripts
 
-Two Python scripts support the analyst agents:
+One Python script supports the technical analyst agent:
 
 ```bash
-# Fetch price history, financial statements, and key metrics
-python scripts/fetch_market_data.py TICKER [-o OUTPUT_DIR]
-
 # Compute RSI, MACD, Bollinger Bands, moving averages, and more
 python scripts/technical_indicators.py TICKER [-o OUTPUT_DIR]
 ```
 
-Both scripts auto-install `yfinance` (and `numpy` for indicators) if not present. Output is JSON.
+The script auto-installs `yfinance` (and `numpy`) if not present. Output is JSON.
 
 ## Project Structure
 
@@ -164,8 +161,7 @@ trading-agents.skill/
 │   ├── risk_manager.md               # Risk evaluator
 │   └── portfolio_manager.md          # Final approver
 ├── scripts/
-│   ├── fetch_market_data.py          # yfinance data fetcher
-│   └── technical_indicators.py       # Technical indicator calculator
+│   └── technical_indicators.py       # Technical indicator calculator (includes price fetching)
 └── evals/
     └── evals.json                    # Evaluation test prompts
 ```

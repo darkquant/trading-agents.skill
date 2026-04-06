@@ -8,26 +8,30 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured fundamental analy
 
 ## Data Gathering
 
-Use these tools to collect data, **prioritizing primary/first-hand sources**:
+Use these tools to collect data, **following this strict data source hierarchy**:
 
-1. **Run the market data script** to get financial statements and key metrics:
+### ⚠️ CRITICAL: Data Source Priority
 
-   ```bash
-   cd {SKILL_PATH} && uv run scripts/fetch_market_data.py {TICKER}
-   ```
+1. **FIRST: Use MCP data sources** — Try the following MCP servers to obtain financial statements, valuation metrics, and market data. To check availability, attempt a query against one of them (e.g., request revenue data for {TICKER} from S&P Global). If you receive valid data, continue using MCP sources for all financial data in this report.
+   - **S&P Global (Kensho)** — Comprehensive financial data, fundamentals, and analytics
+   - **FactSet** — Financial statements, estimates, ownership data
+   - **Daloopa** — Verified financial data extracted from filings
+   - **Morningstar** — Investment research, ratings, fair value estimates
+   - **Moody's** — Credit ratings, risk assessment, financial metrics
+   - **LSEG** — Financial analytics, pricing data, estimates
+   - **Aiera** — Earnings call transcripts, event analysis
+   - **MT Newswires** — Financial news and market data
 
-   This produces a JSON file with price history, income statement, balance sheet, cash flow, and key ratios.
+   These MCP sources provide verified, institutional-grade data with proper audit trails. **Do NOT use web search or Python scripts if MCP data sources are available.**
 
-   > **If the script fails or returns partial data** (look for `"fallback_required": true` in the JSON, or `FALLBACK` in the console output), **you MUST use web search to obtain the missing data**. Do not skip data gathering — switch to step 2 immediately. Common failure modes include network restrictions blocking Yahoo Finance. This is expected; web search is your reliable fallback.
+   > **If MCP sources fail or return incomplete data** (e.g., connection errors, empty responses, missing key metrics), **immediately fall back to step 2 below**. Do not skip data gathering — switch to web search right away. Not all MCP servers may be configured in every environment; this is expected.
 
-2. **Web search for primary sources** — always prioritize first-hand, authoritative data:
+2. **ONLY if MCP sources are unavailable or fail**: Use web search for primary sources — always prioritize first-hand, authoritative data:
    - **Company official sources**: investor relations pages, annual/quarterly reports, earnings press releases
    - **Stock exchange filings**: SEC EDGAR (US), HKEX (HK), SSE/SZSE (China A-shares), SGX, etc.
    - **Regulatory filings**: 10-K, 10-Q, 8-K (US); annual reports, interim reports (HK/CN)
    - Only use analyst estimates and third-party data as supplements, not primary sources
 
-   > **IMPORTANT**: If the market data script failed (yfinance and akshare both unavailable), web search becomes your **primary** data source. You MUST obtain data from the following reliable financial websites:
-   >
    > **推荐数据来源（按优先级排列）：**
    > - **雪球 (Xueqiu)**: `https://xueqiu.com/S/{TICKER}` — 实时行情、财务数据、研报，支持港股/美股/A股
    > - **雅虎财经 (Yahoo Finance)**: `https://finance.yahoo.com/quote/{TICKER}` — 全球股票行情、财务报表、分析师预期

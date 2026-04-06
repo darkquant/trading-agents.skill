@@ -22,9 +22,16 @@ Agent prompts use `{TICKER}`, `{DATE}`, `{SKILL_PATH}`, and `{OUTPUT_DIR}` as te
 
 - `SKILL.md` — The skill definition and orchestration instructions (the "main" file)
 - `agents/*.md` — Individual agent prompts (10 agents total)
-- `scripts/fetch_market_data.py` — Fetches price history, financials, and metrics via yfinance
-- `scripts/technical_indicators.py` — Computes RSI, MACD, Bollinger Bands, moving averages, etc.
+- `scripts/technical_indicators.py` — Fetches price history via yfinance (with akshare fallback) and computes RSI, MACD, Bollinger Bands, moving averages, etc.
 - `evals/evals.json` — Test prompts for evaluating the skill
+
+## Data Sources
+
+The fundamental analyst uses **MCP data sources** from the [financial-analysis](https://github.com/anthropics/financial-services-plugins/tree/main/financial-analysis) plugin as its primary data source. When available, the following MCP servers provide institutional-grade financial data:
+
+- **S&P Global (Kensho)**, **FactSet**, **Daloopa**, **Morningstar**, **Moody's**, **LSEG**, **Aiera**, **MT Newswires**
+
+The technical analyst uses `scripts/technical_indicators.py` for price history and indicator computation.
 
 ## Prerequisites
 
@@ -40,11 +47,10 @@ uv sync            # Install project dependencies from pyproject.toml
 All Python scripts must be executed with `uv run` to use the managed virtual environment:
 
 ```bash
-uv run scripts/fetch_market_data.py TICKER [-o OUTPUT_DIR]
 uv run scripts/technical_indicators.py TICKER [-o OUTPUT_DIR]
 ```
 
-They output JSON files named `{TICKER}_market_data.json` and `{TICKER}_technical_indicators.json`.
+It outputs a JSON file named `{TICKER}_technical_indicators.json`.
 
 ## Git Conventions
 
