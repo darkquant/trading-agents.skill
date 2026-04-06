@@ -77,13 +77,15 @@ prompt from the `agents/` directory. Pass each agent the ticker, date, and any u
 
 Read the agent prompts before spawning:
 
-- `agents/fundamental_analyst.md` — Analyzes financial health, valuation, earnings
+- `agents/fundamental_analyst.md` — Analyzes financial health, valuation, earnings (uses MCP data sources or SEC filings; no Python scripts)
 - `agents/technical_analyst.md` — Analyzes price patterns, indicators, chart signals
 - `agents/sentiment_analyst.md` — Gauges market mood from social media and forums
 - `agents/news_analyst.md` — Evaluates recent news and macro events
 
 Each analyst should save their report to a working directory. The prompts instruct them on
-format and what tools to use (web search, yfinance via the `scripts/fetch_market_data.py` script, etc.).
+format and what tools to use. Note: the fundamental analyst uses MCP data sources or institutional
+filings (SEC EDGAR, company IR pages) — not Python scripts. The technical analyst uses
+`scripts/technical_indicators.py` for price-based indicators.
 
 **Important**: Launch all four in a single message to maximize parallelism. Don't wait for one
 to finish before starting the next.
@@ -179,20 +181,20 @@ Produce **two outputs**:
 ## Configuration Defaults
 
 - **Debate rounds**: 1 (configurable by user, max 5)
-- **Data sources**: Web search + yfinance (scripts/fetch_market_data.py) + optional APIs
+- **Data sources**: MCP sources (Morningstar, S&P, FactSet, Daloopa) → SEC EDGAR / institutional filings → web search fallback
 - **Output**: Both report file + conversational summary
 
 ## Helper Scripts
 
-- `scripts/fetch_market_data.py` — Fetches price history, financial statements, and key metrics via yfinance
-- `scripts/technical_indicators.py` — Computes common technical indicators (RSI, MACD, Bollinger Bands, moving averages)
+- `scripts/technical_indicators.py` — Computes common technical indicators (RSI, MACD, Bollinger Bands, moving averages) — used by the technical analyst only
 
-These scripts are used by the analyst agents. Run them from the skill directory using `uv run`:
+Run from the skill directory using `uv run`:
 
 ```bash
-uv run scripts/fetch_market_data.py <TICKER> [-o OUTPUT_DIR]
 uv run scripts/technical_indicators.py <TICKER> [-o OUTPUT_DIR]
 ```
+
+> **Note**: The fundamental analyst no longer uses `scripts/fetch_market_data.py`. Fundamental data is sourced from MCP providers (Morningstar, FactSet, S&P Global, Daloopa) when available, falling back to SEC EDGAR filings and official company IR pages. This follows the data source hierarchy from the Anthropics [financial-analysis plugin](https://github.com/anthropics/financial-services-plugins/tree/main/financial-analysis) (public repository).
 
 ## Source Citation & Data Quality Standards
 

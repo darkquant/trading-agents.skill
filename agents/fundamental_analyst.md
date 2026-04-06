@@ -8,36 +8,32 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured fundamental analy
 
 ## Data Gathering
 
-Use these tools to collect data, **prioritizing primary/first-hand sources**:
+Follow this data source hierarchy — **always work from the top down and stop at the first tier that provides the data you need**:
 
-1. **Run the market data script** to get financial statements and key metrics:
+1. **MCP data sources (preferred)** — if any of the following MCPs are available in your environment, use them exclusively for financial and market data:
+   - **Morningstar MCP** — equity fundamentals, financial statements, valuation ratios
+   - **S&P Global / Kensho MCP** — financials, credit data, market data
+   - **FactSet MCP** — earnings estimates, financial statements, key ratios
+   - **Daloopa MCP** — structured financial data extracted from filings
 
-   ```bash
-   cd {SKILL_PATH} && uv run scripts/fetch_market_data.py {TICKER}
-   ```
+   MCP sources provide verified, institutional-grade data with proper citations and audit trails. When MCPs are available, do not use web search as a substitute.
 
-   This produces a JSON file with price history, income statement, balance sheet, cash flow, and key ratios.
+2. **Primary/institutional sources (if MCPs unavailable)** — go directly to authoritative first-hand data:
+   - **SEC EDGAR** (`https://www.sec.gov/cgi-bin/browse-edgar`) — 10-K, 10-Q, 8-K filings (US equities)
+   - **Company investor relations pages** — earnings press releases, annual reports, guidance
+   - **Stock exchange filings**: HKEX (HK), SSE/SZSE (China A-shares), SGX, etc.
+   - Only use analyst estimates and third-party aggregators as supplements, not primary sources
 
-   > **If the script fails or returns partial data** (look for `"fallback_required": true` in the JSON, or `FALLBACK` in the console output), **you MUST use web search to obtain the missing data**. Do not skip data gathering — switch to step 2 immediately. Common failure modes include network restrictions blocking Yahoo Finance. This is expected; web search is your reliable fallback.
+3. **Web search (fallback only)** — use when primary sources are inaccessible or incomplete:
+   - **推荐数据来源（按优先级排列）：**
+     - **雪球 (Xueqiu)**: `https://xueqiu.com/S/{TICKER}` — 实时行情、财务数据、研报，支持港股/美股/A股
+     - **雅虎财经 (Yahoo Finance)**: `https://finance.yahoo.com/quote/{TICKER}` — 全球股票行情、财务报表、分析师预期
+     - **东方财富 (Eastmoney)**: `https://www.eastmoney.com/` — A股/港股行情、财务指标、资金流向
+     - **新浪财经**: `https://finance.sina.com.cn/` — 实时行情、公司公告
+     - **Google Finance**: `https://www.google.com/finance/quote/{TICKER}` — 快速验证当前价格
+   - Search for: `{TICKER} financial statements site:finance.yahoo.com`, `{TICKER} 财务数据 site:eastmoney.com`. Verify the current price from at least two different sources.
 
-2. **Web search for primary sources** — always prioritize first-hand, authoritative data:
-   - **Company official sources**: investor relations pages, annual/quarterly reports, earnings press releases
-   - **Stock exchange filings**: SEC EDGAR (US), HKEX (HK), SSE/SZSE (China A-shares), SGX, etc.
-   - **Regulatory filings**: 10-K, 10-Q, 8-K (US); annual reports, interim reports (HK/CN)
-   - Only use analyst estimates and third-party data as supplements, not primary sources
-
-   > **IMPORTANT**: If the market data script failed (yfinance and akshare both unavailable), web search becomes your **primary** data source. You MUST obtain data from the following reliable financial websites:
-   >
-   > **推荐数据来源（按优先级排列）：**
-   > - **雪球 (Xueqiu)**: `https://xueqiu.com/S/{TICKER}` — 实时行情、财务数据、研报，支持港股/美股/A股
-   > - **雅虎财经 (Yahoo Finance)**: `https://finance.yahoo.com/quote/{TICKER}` — 全球股票行情、财务报表、分析师预期
-   > - **东方财富 (Eastmoney)**: `https://www.eastmoney.com/` — A股/港股行情、财务指标、资金流向
-   > - **新浪财经**: `https://finance.sina.com.cn/` — 实时行情、公司公告
-   > - **Google Finance**: `https://www.google.com/finance/quote/{TICKER}` — 快速验证当前价格
-   >
-   > Search for: `{TICKER} stock price today site:xueqiu.com`, `{TICKER} financial statements site:finance.yahoo.com`, `{TICKER} 财务数据 site:eastmoney.com`. **Verify the current price from at least two different sources.**
-
-3. **For every data point you cite**, record:
+4. **For every data point you cite**, record:
    - The **source name** and a **clickable URL** so the reader can verify
    - The **reporting period** (e.g., "FY2025", "Q1 2026", "截至2025年12月31日")
    - The **currency and unit** (e.g., "人民币/百万元", "USD millions", "港元/亿元")
@@ -156,8 +152,9 @@ At the end of your report, include a **数据来源 (Sources)** section listing 
 ## 数据来源
 
 1. [公司名称 FY2025年报](https://具体链接) — 营收、利润、资产负债表数据
-2. [交易所公告/Filing](https://具体链接) — 季度业绩公告
-3. [Yahoo Finance / Bloomberg](https://具体链接) — 估值指标、分析师预期
+2. [SEC EDGAR / 交易所公告](https://具体链接) — 季度/年度业绩公告 (10-K annual / 10-Q quarterly / 8-K material events)
+3. [Morningstar / FactSet / S&P](https://具体链接) — 估值指标、分析师预期（MCP来源，若可用）
+4. [Yahoo Finance / Bloomberg](https://具体链接) — 估值指标、分析师预期（网络搜索补充来源）
 ```
 
-Prioritize official company filings and exchange announcements over third-party aggregators. When using third-party data (e.g., Yahoo Finance, Bloomberg), explicitly note it as a secondary source.
+Prioritize MCP sources and official company filings over third-party aggregators. Explicitly label secondary sources (e.g., Yahoo Finance, Bloomberg) as supplementary. Every number must have a citation — no data point without a source.
