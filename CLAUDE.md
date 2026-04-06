@@ -22,9 +22,17 @@ Agent prompts use `{TICKER}`, `{DATE}`, `{SKILL_PATH}`, and `{OUTPUT_DIR}` as te
 
 - `SKILL.md` — The skill definition and orchestration instructions (the "main" file)
 - `agents/*.md` — Individual agent prompts (10 agents total)
-- `scripts/fetch_market_data.py` — Fetches price history, financials, and metrics via yfinance
+- `scripts/fetch_market_data.py` — Fetches price history, financials, and metrics via yfinance (used by technical analyst)
 - `scripts/technical_indicators.py` — Computes RSI, MACD, Bollinger Bands, moving averages, etc.
 - `evals/evals.json` — Test prompts for evaluating the skill
+
+## Data Sources
+
+The fundamental analyst uses **MCP data sources** from the [financial-analysis](https://github.com/anthropics/financial-services-plugins/tree/main/financial-analysis) plugin as its primary data source. When available, the following MCP servers provide institutional-grade financial data:
+
+- **S&P Global (Kensho)**, **FactSet**, **Daloopa**, **Morningstar**, **Moody's**, **LSEG**, **Aiera**, **MT Newswires**
+
+The technical analyst continues to use `scripts/fetch_market_data.py` and `scripts/technical_indicators.py` for price history and indicator computation.
 
 ## Prerequisites
 
