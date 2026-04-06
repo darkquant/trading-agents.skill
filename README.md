@@ -134,17 +134,14 @@ and I already hold several tech stocks.
 
 ## Helper Scripts
 
-Two Python scripts support the analyst agents:
+One Python script supports the technical analyst agent:
 
 ```bash
-# Fetch price history, financial statements, and key metrics
-python scripts/fetch_market_data.py TICKER [-o OUTPUT_DIR]
-
 # Compute RSI, MACD, Bollinger Bands, moving averages, and more
 python scripts/technical_indicators.py TICKER [-o OUTPUT_DIR]
 ```
 
-Both scripts auto-install `yfinance` (and `numpy` for indicators) if not present. Output is JSON.
+The script auto-installs `yfinance` (and `numpy`) if not present. Output is JSON.
 
 ## Project Structure
 
@@ -164,8 +161,7 @@ trading-agents.skill/
 │   ├── risk_manager.md               # Risk evaluator
 │   └── portfolio_manager.md          # Final approver
 ├── scripts/
-│   ├── fetch_market_data.py          # yfinance data fetcher
-│   └── technical_indicators.py       # Technical indicator calculator
+│   └── technical_indicators.py       # Technical indicator calculator (includes price fetching)
 └── evals/
     └── evals.json                    # Evaluation test prompts
 ```

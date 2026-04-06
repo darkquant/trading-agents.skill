@@ -9,8 +9,9 @@ Usage: uv run scripts/technical_indicators.py TICKER [--output OUTPUT_DIR]
 
 import argparse
 import json
+import re
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -32,6 +33,101 @@ def _retry(func, description: str, retries: int = MAX_RETRIES):
                 print(f"  Retry {attempt}/{retries} for {description} (waiting {delay}s): {e}")
                 time.sleep(delay)
     raise last_error
+
+
+# ---------------------------------------------------------------------------
+# Ticker format detection & conversion (for akshare fallback)
+# ---------------------------------------------------------------------------
+
+def _detect_market(ticker: str) -> str:
+    """Detect which market a ticker belongs to.
+    Returns one of: 'hk', 'us', 'cn_sh', 'cn_sz'.
+    Unrecognized formats default to 'us'.
+    """
+    t = ticker.upper().strip()
+    # Hong Kong: 0883.HK, 1810.HK, 00700.HK
+    if t.endswith(".HK"):
+        return "hk"
+    # Shanghai: 600xxx.SS / 601xxx.SS / 603xxx.SS / 688xxx.SS
+    if t.endswith(".SS") or t.endswith(".SH"):
+        return "cn_sh"
+    # Shenzhen: 000xxx.SZ / 002xxx.SZ / 300xxx.SZ
+    if t.endswith(".SZ"):
+        return "cn_sz"
+    # Pure digits — Chinese stock codes
+    if re.match(r"^\d{6}$", t):
+        if t.startswith(("6", "9")):
+            return "cn_sh"
+        else:
+            return "cn_sz"
+    # HK pure digits (4-5 digits)
+    if re.match(r"^\d{4,5}$", t):
+        return "hk"
+    # Default to US
+    return "us"
+
+
+def _to_akshare_symbol(ticker: str, market: str) -> str:
+    """Convert a standard ticker to akshare's expected format."""
+    t = ticker.upper().strip()
+    if market == "hk":
+        # akshare expects 5-digit zero-padded code, e.g. "01810"
+        code = re.sub(r"\.HK$", "", t)
+        return code.zfill(5)
+    elif market in ("cn_sh", "cn_sz"):
+        # akshare expects pure 6-digit code, e.g. "000001"
+        code = re.sub(r"\.(SS|SH|SZ)$", "", t)
+        return code.zfill(6)
+    else:
+        # US stocks: akshare stock_us_daily uses simple symbol like "AAPL"
+        return re.sub(r"\.(US|O|N|OQ)$", "", t)
+
+
+# Column name mapping: akshare Chinese column names → English
+_AK_HIST_COLS = {
+    "日期": "date", "开盘": "open", "收盘": "close", "最高": "high", "最低": "low",
+    "成交量": "volume", "成交额": "amount", "振幅": "amplitude",
+    "涨跌幅": "change_pct", "涨跌额": "change_amount", "换手率": "turnover_rate",
+}
+
+
+def _fetch_akshare_hist_raw(ticker: str, market: str, days: int = 365) -> pd.DataFrame:
+    """Fetch historical price data from akshare. Returns a DataFrame with English column names."""
+    import akshare as ak
+
+    sym = _to_akshare_symbol(ticker, market)
+    end_date = datetime.now().strftime("%Y%m%d")
+    start_date = (datetime.now() - timedelta(days=days)).strftime("%Y%m%d")
+
+    if market == "hk":
+        df = _retry(lambda: ak.stock_hk_hist(symbol=sym, period="daily", start_date=start_date, end_date=end_date, adjust=""), "akshare HK hist")
+    elif market in ("cn_sh", "cn_sz"):
+        df = _retry(lambda: ak.stock_zh_a_hist(symbol=sym, period="daily", start_date=start_date, end_date=end_date, adjust=""), "akshare A-share hist")
+    elif market == "us":
+        df = _retry(lambda: ak.stock_us_daily(symbol=sym, adjust=""), "akshare US daily")
+    else:
+        raise ValueError(f"Unsupported market: {market}")
+
+    if df is None or df.empty:
+        raise ValueError(f"akshare returned no data for {ticker} (market={market}, symbol={sym})")
+
+    # Normalize column names
+    df = df.rename(columns=_AK_HIST_COLS)
+    # Ensure standard columns exist (US daily from sina has different column names)
+    for std_col in ["date", "open", "high", "low", "close", "volume"]:
+        if std_col not in df.columns:
+            # Try case-insensitive match
+            for c in df.columns:
+                if c.lower() == std_col:
+                    df = df.rename(columns={c: std_col})
+                    break
+
+    # Ensure date column is present and sorted
+    if "date" in df.columns:
+        df["date"] = pd.to_datetime(df["date"])
+        df = df.sort_values("date").reset_index(drop=True)
+
+    return df
 
 
 # ---------------------------------------------------------------------------
@@ -103,21 +199,8 @@ def _fetch_hist_yfinance(ticker: str) -> pd.DataFrame:
 
 def _fetch_hist_akshare(ticker: str) -> pd.DataFrame:
     """Fetch ~1 year daily history via akshare. Returns DataFrame normalized to Close/High/Low/Volume columns."""
-    # Import ticker utilities from our sibling module without mutating sys.path
-    import importlib.util
-
-    script_dir = Path(__file__).parent
-    module_path = script_dir / "fetch_market_data.py"
-    spec = importlib.util.spec_from_file_location("fetch_market_data", module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Unable to load module from {module_path}")
-
-    fetch_market_data = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(fetch_market_data)
-    _detect_market = fetch_market_data._detect_market
-    _fetch_akshare_hist = fetch_market_data._fetch_akshare_hist
     market = _detect_market(ticker)
-    df = _fetch_akshare_hist(ticker, market, days=365)
+    df = _fetch_akshare_hist_raw(ticker, market, days=365)
     if df is None or df.empty:
         raise ValueError("akshare returned empty data")
 

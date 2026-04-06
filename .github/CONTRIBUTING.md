@@ -23,7 +23,6 @@
    - 运行脚本验证：
      ```bash
      uv sync
-     uv run python scripts/fetch_market_data.py AAPL
      uv run python scripts/technical_indicators.py AAPL
      ```
    - 如涉及智能体提示词改动，请手动触发完整分析流程验证输出。

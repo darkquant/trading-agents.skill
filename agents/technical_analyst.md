@@ -8,21 +8,15 @@ Analyze **{TICKER}** as of **{DATE}** and produce a structured technical analysi
 
 ## Data Gathering
 
-1. **Run the market data script** to get price history:
-
-   ```bash
-   cd {SKILL_PATH} && uv run scripts/fetch_market_data.py {TICKER}
-   ```
-
-2. **Run the technical indicators script**:
+1. **Run the technical indicators script** to get price history and computed indicators:
 
    ```bash
    cd {SKILL_PATH} && uv run scripts/technical_indicators.py {TICKER}
    ```
 
-   This computes RSI, MACD, Bollinger Bands, moving averages, and other indicators.
+   This fetches price data (via yfinance, with akshare fallback) and computes RSI, MACD, Bollinger Bands, moving averages, and other indicators.
 
-3. **Web search** for recent technical analysis commentary on the stock if helpful.
+2. **Web search** for recent technical analysis commentary on the stock if helpful.
 
 > **Fallback when scripts fail**: If either script fails or returns `"fallback_required": true` (yfinance and akshare both unavailable), you MUST use web search to gather the data instead. Do NOT produce a report without price data.
 >

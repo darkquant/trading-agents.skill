@@ -133,17 +133,14 @@ Run a full analysis on NVDA with 2 rounds of debate.
 
 ## 辅助脚本
 
-两个 Python 脚本为分析师智能体提供数据支持：
+一个 Python 脚本为技术面分析师智能体提供数据支持：
 
 ```bash
-# 获取价格历史、财务报表和关键指标
-python scripts/fetch_market_data.py TICKER [-o OUTPUT_DIR]
-
 # 计算 RSI、MACD、布林带、移动平均线等技术指标
 python scripts/technical_indicators.py TICKER [-o OUTPUT_DIR]
 ```
 
-两个脚本都会在缺少依赖时自动安装 `yfinance`（技术指标脚本还会安装 `numpy`），输出为 JSON 格式。
+脚本会在缺少依赖时自动安装 `yfinance` 和 `numpy`，输出为 JSON 格式。
 
 ## 项目结构
 
@@ -163,8 +160,7 @@ trading-agents.skill/
 │   ├── risk_manager.md               # 风控经理
 │   └── portfolio_manager.md          # 投资组合经理
 ├── scripts/
-│   ├── fetch_market_data.py          # yfinance 数据获取
-│   └── technical_indicators.py       # 技术指标计算
+│   └── technical_indicators.py       # 技术指标计算（含价格数据获取）
 └── evals/
     └── evals.json                    # 评测用测试提示
 ```
