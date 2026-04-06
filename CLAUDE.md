@@ -50,7 +50,7 @@ All Python scripts must be executed with `uv run` to use the managed virtual env
 uv run scripts/technical_indicators.py TICKER [-o OUTPUT_DIR]
 ```
 
-They output JSON files named `{TICKER}_technical_indicators.json`.
+It outputs a JSON file named `{TICKER}_technical_indicators.json`.
 
 ## Git Conventions
 
